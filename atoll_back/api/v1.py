@@ -11,7 +11,7 @@ from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
-    remove_mail_code, update_user, get_events
+    remove_mail_code, update_user, get_events, get_ratings
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -234,7 +234,7 @@ async def update_team():
 @api_v1_router.get('/event.all', response_model=list[EventOut], tags=['Event'])
 async def get_all_events():
     events = await get_events()
-    return [EventOut.parse_dbm_kwargs(**event.dict()) for event in events]
+    return [EventOut.parse_dbm_kwargs(**event.dict(), ratings=get_ratings(event.oid)) for event in events]
 
 
 @api_v1_router.post('/event.update', tags=['Event'], deprecated=True)
