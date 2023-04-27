@@ -53,7 +53,6 @@ class EventOut(BaseOutDBMSchema):
     title: str
     description: str
     team_ods: Optional[list[str]]
-    author_oid: str
     start_dt: datetime
     end_dt: datetime
     timeline: list[TimelineOut]
