@@ -21,11 +21,9 @@ from atoll_back.db.user import UserFields
 from atoll_back.utils import roles_to_list
 
 
-class WithMiscData(BaseModel):
+class BaseDBM(BaseModel):
     misc_data: dict[Any, Any] = Field(default={})
 
-
-class BaseDBM(WithMiscData):
     # db fields
     oid: Optional[ObjectId] = Field(alias=BaseFields.oid)
     int_id: Optional[int] = Field(alias=BaseFields.int_id)
