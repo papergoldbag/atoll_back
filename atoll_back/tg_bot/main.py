@@ -8,6 +8,9 @@ def main():
     from atoll_back.tg_bot.handlers import import_handlers
     import_handlers()
 
+    from atoll_back.tg_bot.events import setup_events
+    setup_events()
+
     from atoll_back.core import executor_
     executor_.start_polling(reset_webhook=True)
 

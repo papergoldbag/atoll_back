@@ -27,3 +27,5 @@ class Modes(SetForClass):
 class TgBotCommands(SetForClass):
     start = "start"
     echo = "echo"
+    events = 'events'
+    site = "site"
