@@ -9,6 +9,7 @@ class UserFields(BaseFields):
     birth_dt = "birth_dt"
     tokens = "tokens"
     tg_id = "tg_id"
+    vk_id = "vk_id"
     tg_username = "tg_username"
     roles = "roles"
     description = "description"

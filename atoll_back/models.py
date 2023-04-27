@@ -94,7 +94,8 @@ class User(BaseDBM):
     tokens: list[str] = Field(alias=UserFields.tokens, default=[])
     birth_dt: Optional[datetime] = Field(alias=UserFields.birth_dt)
     tg_username: Optional[str] = Field(alias=UserFields.tg_username)
-    tg_id: Optional[str] = Field(alias=UserFields.tg_username)
+    tg_id: Optional[str] = Field(alias=UserFields.tg_id)
+    vk_id: Optional[str] = Field(alias=UserFields.vk_id)
     roles: list[str] = Field(alias=UserFields.roles, default=[])
     description: Optional[str] = Field(alias=UserFields.description)
 

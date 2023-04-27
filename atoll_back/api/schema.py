@@ -109,6 +109,7 @@ class UserOut(BaseOutDBMSchema):
     birth_dt: Optional[datetime] = None
     tg_username: Optional[str] = None
     tg_id: Optional[str] = None
+    vk_id: Optional[str] = None
     roles: list[str] = []
     description: Optional[str] = None
 
@@ -141,6 +142,7 @@ class UpdateUserIn(BaseSchemaIn):
     fullname: Optional[str] = None
     birth_dt: Optional[datetime] = None
     tg_username: Optional[str] = None
+    vk_id: Optional[str] = None
     description: Optional[str] = None
 
 
