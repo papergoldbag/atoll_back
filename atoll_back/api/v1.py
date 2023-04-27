@@ -251,7 +251,11 @@ async def get_all_events(user: User = Depends(get_strict_current_user)):
 
 
 @api_v1_router.get("/event.join", deprecated=True, tags=["Me"])
-async def me_join_event(user: User = Depends(get_strict_current_user)):
+async def event_join(
+        user: User = Depends(get_strict_current_user),
+        event_int_id: int = Query(...)
+):
+    # TODO
     ...
 
 
@@ -275,7 +279,9 @@ async def send_feedback():
 
 
 @api_v1_router.get('/event.feedbacks', tags=['Event'], deprecated=True)
-async def get_event_feedbacks():
+async def get_event_feedbacks(
+        event_int_id: int = Query(...)
+):
     ...
 
 
