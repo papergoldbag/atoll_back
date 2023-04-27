@@ -26,6 +26,7 @@ class BaseSchemaIn(BaseSchema):
 
 
 class RatingOut(BaseOutDBMSchema):
+    event_oid: str
     place: int
     team_oid: str
 
@@ -42,7 +43,6 @@ class EventOut(BaseOutDBMSchema):
     author_oid: str 
     start_dt: datetime
     end_dt: datetime 
-    ratings: list[RatingOut]
     timeline: list[TimelineOut]
 
 
