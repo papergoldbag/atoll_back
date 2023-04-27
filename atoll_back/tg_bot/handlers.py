@@ -13,7 +13,11 @@ log = logging.getLogger(__name__)
 
 @dp.message_handler(commands=TgBotCommands.start)
 async def on_cmd_start(message: types.Message):
-    await message.answer(message.text)
+    await message.answer(
+        text=(
+            "<b>Здравствуйте, данный бот позволит узнать список всех актуальных мероприятий</b>"
+        )
+    )
 
 
 @dp.message_handler(commands=TgBotCommands.events)
@@ -42,7 +46,7 @@ async def on_cmd_events(message: types.Message):
 
 @dp.message_handler(commands=TgBotCommands.site)
 async def on_cmd_site(message: types.Message):
-    await message.answer(message.text)
+    await message.answer("<a href='https://atoll.divarteam.ru/'>Переходите на наш сайт</a>")
 
 
 @dp.message_handler(commands=TgBotCommands.echo)
