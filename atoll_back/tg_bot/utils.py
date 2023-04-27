@@ -8,7 +8,8 @@ async def get_team_id(useroid: str):
     teams = db.team_collection.pymongo_collection.find({})
     team_id = -1
     for team in teams:
-        for uoid in teams.useroids:
+        print(team)
+        for uoid in teams.user_oids:
             if useroid == uoid:
                 return team.oid
     return None 

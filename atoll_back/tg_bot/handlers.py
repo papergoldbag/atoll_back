@@ -30,16 +30,23 @@ async def on_btn_auth(message: types.Message, state: FSMContext):
     await message.answer("Вы успешно авторизировались", reply_markup=base_user_keyboard.menu_keyboard)
     await UserStates.authorized.set()
 
+
+@dp.message_handler(state=None)
+async def on_text_auth(message: types.Message):
+    await message.answer(f"Здраствуйте, {message.from_user.first_name}, пожалуйста авторизуйтесь!", reply_markup=base_user_keyboard.start_keyboard)
+
+
 @dp.message_handler(text = "Мероприятия", state=[UserStates.authorized])
 async def on_btn_event(message: types.Message):
     events = await get_events()
-    if len(events) == 0:
-        await message.answer("Мероприятий не запланировано!")
-    else:
-        await message.answer(emoji.emojize(":calendar: Запланированы следующие мероприятия :calendar:\n"))
+    await message.answer(len(events))
+    # if len(events) == 0:
+    #     await message.answer("Мероприятий не запланировано!")
+    # else:
+    #     await message.answer(emoji.emojize(":calendar: Запланированы следующие мероприятия :calendar:\n"))
         
-    for event in events:
-         await message.answer(await get_event_description(event))
+    # for event in events:
+    #      await message.answer(await get_event_description(event))
 
 @dp.message_handler(text = "Мои события", state=[UserStates.authorized])
 async def on_btn_event(message: types.Message):
