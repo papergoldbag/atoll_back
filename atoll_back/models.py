@@ -133,7 +133,7 @@ class Team(BaseDBM):
     users: list[User] = Field(default=[])
 
 
-class Rating(BaseUtilsForDBM):
+class Rating(BaseDBM):
     team_oid: ObjectId = Field(alias='team_oid')
     place: int = Field(alias='place')
 
@@ -182,8 +182,9 @@ class Feedback(BaseDBM):
     user: Optional[User] = Field(default=None)
     event: Optional[Event] = Field(default=None)
 
+
 class Invite(BaseDBM):
-    #db fields
+    # db fields
     from_team_oid: ObjectId = Field(alias=InviteFields.from_team_oid)
     to_user_oid: ObjectId = Field(alias=InviteFields.to_user_oid)
     
