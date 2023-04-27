@@ -318,7 +318,7 @@ async def get_team(*, id_: Id) -> Optional[Team]:
 
 
 async def get_teams() -> list[Team]:
-    team_docs = await db.team_collection.get_documents()
+    team_docs = await db.team_collection.get_all_docs()
     return [Team.parse_document(team_doc) for team_doc in team_docs]
 
 
