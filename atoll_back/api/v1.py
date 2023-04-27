@@ -223,7 +223,7 @@ async def get_all_teams():
     return await get_teams()
 
 
-@api_v1_router.get('/team.get_by_id', response_model=Optional[TeamOut], tags=['Team'])
+@api_v1_router.get('/team.get_by_int_id', response_model=Optional[TeamOut], tags=['Team'])
 async def get_team_by_id(int_id: int = Query(...)):
     team = await get_team(id_=int_id)
     if team is None:
