@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Optional, Any
 
-from bson import ObjectId
 from pydantic import BaseModel, Extra
 
 
@@ -16,21 +15,7 @@ class BaseSchemaOut(BaseSchema):
     misc: dict[str, Any] = {}
 
 
-class BaseUtilsForDBMOutSchema(BaseSchemaOut):
-    @classmethod
-    def parse_dbm_kwargs(
-            cls,
-            **kwargs
-    ):
-        res = {}
-        for k, v in kwargs.items():
-            if isinstance(v, ObjectId):
-                v = str(v)
-            res[k] = v
-        return cls(**res)
-
-
-class BaseOutDBMSchema(BaseUtilsForDBMOutSchema):
+class BaseOutDBMSchema(BaseSchemaOut):
     oid: str
     int_id: int
     created: datetime
@@ -40,12 +25,12 @@ class BaseSchemaIn(BaseSchema):
     pass
 
 
-class RatingOut(BaseUtilsForDBMOutSchema):
+class RatingOut(BaseOutDBMSchema):
     place: str
     team_oid: str
 
 
-class TimelineOut(BaseUtilsForDBMOutSchema):
+class TimelineOut(BaseModel):
     dt: datetime
     text: str
 

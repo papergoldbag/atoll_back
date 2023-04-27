@@ -24,7 +24,12 @@ class WithMiscData(BaseModel):
     misc_data: dict[Any, Any] = Field(default={})
 
 
-class BaseUtilsForDBM(WithMiscData):
+class BaseDBM(WithMiscData):
+    # db fields
+    oid: Optional[ObjectId] = Field(alias=BaseFields.oid)
+    int_id: Optional[int] = Field(alias=BaseFields.int_id)
+    created: Optional[datetime] = Field(alias=BaseFields.created)
+
     class Config:
         extra = Extra.ignore
         arbitrary_types_allowed = True
@@ -53,7 +58,7 @@ class BaseUtilsForDBM(WithMiscData):
         return data
 
     @classmethod
-    def parse_document(cls, doc: Document) -> BaseUtilsForDBM:
+    def parse_document(cls, doc: Document) -> BaseDBM:
         """get only fields that has alias and exists in doc"""
         doc_to_parse = {}
         for f in cls.__fields__.values():
@@ -81,13 +86,6 @@ class BaseUtilsForDBM(WithMiscData):
             elif f.outer_type_ in [list[IPv4Interface], list[IPv4Address]]:
                 doc[f.alias] = [str(ip) for ip in doc[f.alias]]
         return doc
-
-
-class BaseDBM(BaseUtilsForDBM):
-    # db fields
-    oid: Optional[ObjectId] = Field(alias=BaseFields.oid)
-    int_id: Optional[int] = Field(alias=BaseFields.int_id)
-    created: Optional[datetime] = Field(alias=BaseFields.created)
 
 
 class User(BaseDBM):
@@ -138,7 +136,7 @@ class Rating(BaseDBM):
     place: int = Field(alias='place')
 
 
-class Timeline(BaseUtilsForDBM):
+class Timeline(BaseModel):
     dt: datetime = Field(alias='dt')
     text: str = Field(alias='text')
 
