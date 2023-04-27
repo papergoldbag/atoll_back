@@ -12,6 +12,7 @@ from atoll_back.db.invite import InviteCollection
 from atoll_back.db.mailcode import MailCodeCollection
 from atoll_back.db.team import TeamCollection
 from atoll_back.db.user import UserCollection
+from atoll_back.db.rating import RatingCollection
 
 
 class CannotConnectToDb(Exception):
@@ -74,6 +75,12 @@ class DB:
             pymongo_db=self.pymongo_db
         )
         self.collections.append(self.feedback_collection)
+
+        self.rating_collection: RatingCollection = RatingCollection.from_mongo_db(
+            motor_db=self.motor_db,
+            pymongo_db=self.pymongo_db
+        )
+        self.collections.append(self.rating_collection)
 
     async def ensure_all_indexes(self):
         self.log.info('ensuring all indexes')
