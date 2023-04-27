@@ -40,7 +40,7 @@ class BaseSchemaIn(BaseSchema):
 
 class RatingOut(BaseModel):
     place: str
-    team_oid: int
+    team_oid: str
 
 
 class TimelineOut(BaseModel):
