@@ -26,7 +26,7 @@ class BaseSchemaIn(BaseSchema):
 
 
 class RatingOut(BaseOutDBMSchema):
-    place: str
+    place: int
     team_oid: str
 
 
@@ -71,7 +71,7 @@ class FeedbackOut(BaseOutDBMSchema):
     event_oid: str
     user_oid: str
     text: str
-    
+
 
 class UserOut(BaseOutDBMSchema):
     fullname: Optional[str] = None
