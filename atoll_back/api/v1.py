@@ -1,10 +1,12 @@
 from typing import Optional
 from bson import ObjectId
 
+from statistics import median, mean
+
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, TeamUpdate, \
+from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, TeamUpdate, \
     UserOut, UpdateUserIn, InviteOut,\
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamsOut
@@ -363,6 +365,27 @@ async def update_team(
 
 
 """EVENT"""
+
+
+@api_v1_router.get('/event.analytics', tags=['Event'], response_model=EventAnalyticsOut)
+async def get_analytics(event_int_id: int = Query(...), user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.admin]))):
+    event = await get_event(id_=event_int_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
+    event_teams = [len((await get_team(id_=x)).user_oids) for x in event.team_oids]
+
+    feedbacks = await get_feedbacks(event_id=event.oid)
+
+    a_d = dict(
+        teams_count = len(event_teams),
+        mean_teams_participants = mean(event_teams),
+        participants_count = median(event_teams),
+        feedbacks_count = len(feedbacks)
+    )
+
+    return EventAnalyticsOut.parse_obj(a_d)
+
+
 
 
 @api_v1_router.get('/event.all', response_model=list[EventOut], tags=['Event'])

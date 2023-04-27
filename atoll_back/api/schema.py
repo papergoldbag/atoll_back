@@ -86,6 +86,13 @@ class EventRequestOut(BaseOutDBMSchema):
     timeline: list[TimelineOut]
 
 
+class EventAnalyticsOut(BaseModel):
+    teams_count: int
+    mean_teams_participants: int
+    participants_count: int
+    feedbacks_count: int 
+
+
 class EventRequestIn(BaseSchemaIn):
     title: str
     description: str
