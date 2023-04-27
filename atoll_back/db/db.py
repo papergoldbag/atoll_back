@@ -127,8 +127,7 @@ class DB:
 
 async def __example():
     from atoll_back.core import db
-    await db.drop_collections(only_using=False)
-    await db.ensure_all_indexes()
+    await db.team_collection.get_all_docs()
 
 
 if __name__ == '__main__':

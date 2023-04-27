@@ -244,13 +244,6 @@ class BaseCollection:
         document = await self.motor_collection.find_one(filter_)
         return document
 
-    async def find_documents(
-            self, filter_: Optional[Filter] = None
-    ) -> list[Document]:
-        filter_ = self.__normalize_filter(filter_)
-        cursor = self.motor_collection.find(filter_)
-        return [doc async for doc in cursor]
-
     async def find_document_by_id(
             self, id_: Id
     ) -> Optional[Document]:
@@ -268,7 +261,8 @@ class BaseCollection:
         return await self.find_document({BaseFields.int_id: int_id})
 
     async def get_all_docs(self) -> list[Document]:
-        return await self.find_documents(self.create_cursor())
+        cursor = self.create_cursor()
+        return [doc async for doc in cursor]
 
     async def count_documents(self, filter_: Optional[Filter] = None) -> int:
         filter_ = self.__normalize_filter(filter_)

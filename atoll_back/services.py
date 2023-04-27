@@ -355,7 +355,7 @@ async def get_ratings(*, event_oid: Optional[ObjectId]) -> list[Rating]:
     if event_oid is not None:
         filter_[RatingFields.event_oid] = event_oid
 
-    docs = db.rating.find_documents(filter_=filter_)
+    docs = db.rating.get_all_docs()
     ratings: list[Rating] = [Rating.parse_document(doc) for doc in docs]
     ratings.sort(key=lambda k: k.place)
     return ratings
