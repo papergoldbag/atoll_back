@@ -1,20 +1,22 @@
 import asyncio
 import binascii
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import randint
 from typing import Union, Optional
 
 import pymongo
 from bson import ObjectId
+from fastapi import HTTPException
 
 from atoll_back.consts import UserRoles, RolesType
 from atoll_back.core import db, bot
 from atoll_back.db.base import Id
+from atoll_back.db.event import EventFields
 from atoll_back.db.mailcode import MailCodeFields
 from atoll_back.db.user import UserFields
 from atoll_back.helpers import NotSet, is_set
-from atoll_back.models import User, MailCode, Event, Team
+from atoll_back.models import User, MailCode, Event, Team, Rating, Timeline
 from atoll_back.utils import roles_to_list
 
 """USER LOGIC"""
@@ -284,9 +286,67 @@ async def get_events() -> list[Event]:
     return events
 
 
-async def __example():
-    await send_from_tg_bot(text='asfasf')
+"""EVENT LOGIC"""
+
+
+async def create_event(
+        *,
+        title: str,
+        description: str,
+        team_oids: list[ObjectId] = None,
+        author_oid: ObjectId,
+        start_dt: datetime = None,
+        end_dt: datetime,
+        ratings: list[Rating] = None,
+        timeline: list[Timeline] = None
+) -> Event:
+    if start_dt is None:
+        start_dt = datetime.utcnow()
+
+    if ratings is None:
+        ratings = []
+
+    if timeline is None:
+        timeline = []
+
+    if team_oids is None:
+        team_oids = []
+
+    author = await get_user(id_=author_oid)
+    if author is None:
+        raise ValueError("author is None")
+
+    doc_to_insert = {
+        EventFields.title: title,
+        EventFields.description: description,
+        EventFields.team_oids: team_oids,
+        EventFields.author_oid: author_oid,
+        EventFields.start_dt: start_dt,
+        EventFields.end_dt: end_dt,
+        EventFields.ratings: ratings,
+        EventFields.timeline: timeline
+    }
+    inserted_doc = await db.event_collection.insert_document(
+        doc_to_insert
+    )
+    created_event = Event.parse_document(inserted_doc)
+
+    return created_event
+
+
+async def example():
+    await create_event(
+        title="TEST",
+        description="TEST",
+        author_oid=ObjectId("644a2f78179dc88230979e93"),
+        end_dt=datetime.utcnow() + timedelta(days=30),
+        ratings=[Rating(team_oid=ObjectId(), place=1)],
+        timeline=[Timeline(
+            dt=datetime.utcnow(),
+            text='asfasa'
+        )]
+    )
 
 
 if __name__ == '__main__':
-    asyncio.run(__example())
+    asyncio.run(example())
