@@ -298,7 +298,7 @@ async def create_event(
         start_dt: datetime = None,
         end_dt: datetime,
         ratings: list[Rating] = None,
-        timeline: list[Timeline] = None
+        timelines: list[Timeline] = None
 ) -> Event:
     if start_dt is None:
         start_dt = datetime.utcnow()
@@ -306,8 +306,8 @@ async def create_event(
     if ratings is None:
         ratings = []
 
-    if timeline is None:
-        timeline = []
+    if timelines is None:
+        timelines = []
 
     if team_oids is None:
         team_oids = []
@@ -323,8 +323,8 @@ async def create_event(
         EventFields.author_oid: author_oid,
         EventFields.start_dt: start_dt,
         EventFields.end_dt: end_dt,
-        EventFields.ratings: ratings,
-        EventFields.timeline: timeline
+        EventFields.ratings: [r.document() for r in ratings],
+        EventFields.timeline: [t.document() for t in timelines]
     }
     inserted_doc = await db.event_collection.insert_document(
         doc_to_insert
@@ -341,7 +341,7 @@ async def example():
         author_oid=ObjectId("644a2f78179dc88230979e93"),
         end_dt=datetime.utcnow() + timedelta(days=30),
         ratings=[Rating(team_oid=ObjectId(), place=1)],
-        timeline=[Timeline(
+        timelines=[Timeline(
             dt=datetime.utcnow(),
             text='asfasa'
         )]
