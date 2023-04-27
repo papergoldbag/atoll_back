@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import Callable, Union
 
@@ -8,13 +9,11 @@ from vk_api import VkApi
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEvent, VkBotMessageEvent
 from vk_api.vk_api import VkApiMethod
 
-from ...settings import PROD_MODE
-from ...utils.logger import get_logger
-from ...utils.vkboty.easy_vk import EasyVk
-from ...utils.vkboty.memory import Memory
-from ...utils.vkboty.threader import Threader
+from atoll_back.vk_bot.vkboty.easy_vk import EasyVk
+from atoll_back.vk_bot.vkboty.memory import Memory
+from atoll_back.vk_bot.vkboty.threader import Threader
 
-logger = get_logger()
+logger = logging.getLogger(__name__)
 
 
 class Actions:
@@ -27,7 +26,7 @@ USER_AGENT = (
 
 
 class VkBoty:
-    def __init__(self, token: str, group_id: str, api_version: str):
+    def __init__(self, token: str, group_id: str, api_version: str = "5.131"):
         __session = Session()
         __adapter = HTTPAdapter(max_retries=15)
         __session.mount("http://", __adapter)
@@ -101,10 +100,7 @@ class VkBoty:
             future = self.threader.start_new(self.__handle, e)
             exc = future.exception()
             if exc:
-                if not PROD_MODE:
-                    raise future.exception()
-                else:
-                    logger.exception("exception in a handling thread", exc_info=exc)
+                logger.exception("exception in a handling thread", exc_info=exc)
 
     def start(self):
         logger.info('start')

@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     tg_bot_token: str
 
     vk_bot_token: str
+    vk_group_id: str = "220168186"
 
     cache_dirname: str = "cache"
     cache_dirpath: str = os.path.join(BASE_DIRPATH, cache_dirname)
