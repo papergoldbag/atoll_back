@@ -152,12 +152,17 @@ async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_stric
     )
 
 
-@api_v1_router.get("/me.requests_to_create_team", tags=["Me"])
+@api_v1_router.get("/me.accepts", tags=["Me"], deprecated=True)
 async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
     ...
 
 
-@api_v1_router.post('/me.accept_request', response_model=OperationStatusOut, tags=['Me'])
+@api_v1_router.get("/me.accept_invite", tags=["Me"], deprecated=True)
+async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
+    ...
+
+
+@api_v1_router.post('/me.create_accept', response_model=OperationStatusOut, tags=['Me'], deprecated=True)
 async def me_update(user: User = Depends(get_strict_current_user)):
     ...
 
