@@ -278,6 +278,14 @@ async def create_mail_code(
     return created_mail_code
 
 
+"""RATINGS LOGIC"""
+
+async def get_ratings(event_oid: ObjectId) -> list[Rating]:
+    ratings: list[Rating] = [Rating.parse_document(x) for x in db.rating.find_document({"event_oid" : event_oid})]
+    ratings.sort(key=lambda k: k.place)
+    return ratings
+
+
 """Event logic"""
 
 

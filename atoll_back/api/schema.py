@@ -57,6 +57,7 @@ class EventOut(BaseOutDBMSchema):
     start_dt: datetime
     end_dt: datetime
     timeline: list[TimelineOut]
+    ratings: list[RatingOut]
 
 
 class TeamOut(BaseOutDBMSchema):
