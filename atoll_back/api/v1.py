@@ -559,6 +559,8 @@ async def add_event_requests(
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner]))
 ):
+    if event_data.end_dt < event_data.start_dt:
+        raise HTTPException(status_code=400, detail="end_dt must be greater than start_dt") 
     req = await create_event_request(
         title=event_data.title,
         description=event_data.description,
