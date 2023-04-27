@@ -375,13 +375,13 @@ async def create_event_request(
         requestor_oid: ObjectId,
         start_dt: datetime = None,
         end_dt: datetime,
-        timelines: list[Timeline] = None
+        timeline: list[Timeline] = None
 ) -> EventRequest:
     if start_dt is None:
         start_dt = datetime.utcnow()
 
-    if timelines is None:
-        timelines = []
+    if timeline is None:
+        timeline = []
 
     if team_oids is None:
         team_oids = []
@@ -396,7 +396,7 @@ async def create_event_request(
         EventRequestFields.requestor_oid: requestor_oid,
         EventRequestFields.start_dt: start_dt,
         EventRequestFields.end_dt: end_dt,
-        EventRequestFields.timeline: [t.dict() for t in timelines]
+        EventRequestFields.timeline: [t.dict() for t in timeline]
     }
     inserted_doc = await db.event_request_collection.insert_document(
         doc_to_insert
