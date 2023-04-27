@@ -350,13 +350,13 @@ async def create_rating(
     return created_rating
 
 
-async def get_ratings(*, event_oid: Optional[ObjectId]) -> list[Rating]:
+async def get_ratings(*, event_oid: Optional[ObjectId] = None) -> list[Rating]:
     filter_ = {}
     if event_oid is not None:
         filter_[RatingFields.event_oid] = event_oid
 
-    docs = db.rating.get_all_docs()
-    ratings: list[Rating] = [Rating.parse_document(doc) for doc in docs]
+    cursor = db.rating.create_cursor(filter_=filter_)
+    ratings: list[Rating] = [Rating.parse_document(doc) async for doc in cursor]
     ratings.sort(key=lambda k: k.place)
     return ratings
 
@@ -374,9 +374,6 @@ async def get_event(*, id_: Id) -> Optional[Event]:
 async def get_events() -> list[Event]:
     events = [Event.parse_document(doc) async for doc in db.event_collection.create_cursor()]
     return events
-
-
-"""EVENT LOGIC"""
 
 
 async def create_event(
@@ -420,16 +417,7 @@ async def create_event(
 
 
 async def example():
-    await create_event(
-        title="TEST",
-        description="TEST",
-        author_oid=ObjectId("644a2f78179dc88230979e93"),
-        end_dt=datetime.utcnow() + timedelta(days=30),
-        timelines=[Timeline(
-            dt=datetime.utcnow(),
-            text='asfasa'
-        )]
-    )
+    await get_ratings()
 
 
 if __name__ == '__main__':
