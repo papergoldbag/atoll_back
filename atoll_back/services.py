@@ -545,10 +545,22 @@ async def get_invite(
     to_user_oid: ObjectId
 ) -> Optional[Invite]:
     invite = db.invite_collection.find_document({
-        'from_team_oid':from_team_oid,
-        'to_user_oid':to_user_oid
+        InviteFields.from_team_oid:from_team_oid,
+        InviteFields.to_user_oid:to_user_oid
     })
     return invite
+
+
+async def get_invites(
+        *,
+        to_user_oid: ObjectId
+) -> list[Invite]:
+    invites = [Invite.parse_document(x) async for x in db.invite_collection.create_cursor(filter_={
+        InviteFields.to_user_oid:to_user_oid
+    })]
+    return invites
+
+
 
 async def create_invite(
         *,

@@ -13,7 +13,7 @@ from atoll_back.core import db
 from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline, Rating
-from atoll_back.services import create_invite, get_invite, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
+from atoll_back.services import create_invite, get_invite, get_invites, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
     remove_mail_code, send_from_tg_bot, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
     get_event_requests, get_event_request, event_request_to_event, create_team, create_rating, create_feedback, \
     get_feedback, get_feedbacks
@@ -181,18 +181,14 @@ async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_stric
     )
 
 
-@api_v1_router.get("/me.invite", tags=["Me"], deprecated=True)
-async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
-    ...
+@api_v1_router.get("/me.my_invites", tags=["Me"], response_model=list[InviteOut])
+async def get_my_invites(user: User = Depends(get_strict_current_user)):
+    invites = await get_invites(to_user_oid=user.oid)
+    return [InviteOut.parse_dbm_kwargs(**x.dict()) for x in invites]
 
 
 @api_v1_router.get("/me.accept_invite", tags=["Me"], deprecated=True)
 async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
-    ...
-
-
-@api_v1_router.post('/me.create_invite', response_model=OperationStatusOut, tags=['Me'], deprecated=True)
-async def me_update(user: User = Depends(get_strict_current_user)):
     ...
 
 
