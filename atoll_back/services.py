@@ -30,7 +30,8 @@ async def update_user(
         fullname: Union[NotSet, Optional[str]] = NotSet,
         birth_dt: Union[NotSet, Optional[datetime]] = NotSet,
         tg_id: Union[NotSet, Optional[int]] = NotSet,
-        tg_username: Union[NotSet, Optional[str]] = NotSet
+        tg_username: Union[NotSet, Optional[str]] = NotSet,
+        description: Union[NotSet, Optional[str]] = NotSet
 ) -> User:
     if isinstance(user, User):
         pass
@@ -53,6 +54,8 @@ async def update_user(
         set_[UserFields.tg_id] = tg_id
     if is_set(tg_username):
         set_[UserFields.tg_username] = tg_username
+    if is_set(description):
+        set_[UserFields.description] = description
 
     if set_:
         await db.user_collection.update_document_by_id(
@@ -68,6 +71,8 @@ async def update_user(
             user.tg_id = tg_id
         if is_set(tg_username):
             user.tg_username = tg_username
+        if is_set(description):
+            user.tg_username = description
 
     return user
 
