@@ -1,5 +1,6 @@
 import asyncio
 import binascii
+import logging
 import os
 from datetime import datetime, timedelta
 from random import randint
@@ -22,6 +23,9 @@ from atoll_back.models import User, MailCode, Event, Team, Rating, Timeline, Eve
 from atoll_back.utils import roles_to_list
 
 """USER LOGIC"""
+
+
+log = logging.getLogger()
 
 
 async def update_user(
@@ -185,10 +189,13 @@ async def send_from_tg_bot(*, text: str, to_roles: Optional[RolesType] = None, t
     for user in users_to_send:
         if user.tg_id is None:
             continue
-        await bot.send_message(
-            chat_id=user.tg_id,
-            text=text
-        )
+        try:
+            await bot.send_message(
+                chat_id=user.tg_id,
+                text=text
+            )
+        except Exception as e:
+            log.exception(e)
 
 
 """MAIL CODE LOGIC"""
