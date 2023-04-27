@@ -16,11 +16,7 @@ class BaseSchemaOut(BaseSchema):
     misc: dict[str, Any] = {}
 
 
-class BaseOutDBMSchema(BaseSchemaOut):
-    oid: str
-    int_id: int
-    created: datetime
-
+class BaseUtilsForDBMOutSchema(BaseSchemaOut):
     @classmethod
     def parse_dbm_kwargs(
             cls,
@@ -34,16 +30,22 @@ class BaseOutDBMSchema(BaseSchemaOut):
         return cls(**res)
 
 
+class BaseOutDBMSchema(BaseUtilsForDBMOutSchema):
+    oid: str
+    int_id: int
+    created: datetime
+
+
 class BaseSchemaIn(BaseSchema):
     pass
 
 
-class RatingOut(BaseOutDBMSchema):
+class RatingOut(BaseUtilsForDBMOutSchema):
     place: str
     team_oid: str
 
 
-class TimelineOut(BaseOutDBMSchema):
+class TimelineOut(BaseUtilsForDBMOutSchema):
     dt: datetime
     text: str
 
