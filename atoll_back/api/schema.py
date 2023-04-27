@@ -38,12 +38,12 @@ class BaseSchemaIn(BaseSchema):
     pass
 
 
-class Rating(BaseModel):
+class RatingOut(BaseModel):
     place: str
-    team_int_id: int
+    team_oid: int
 
 
-class Timeline(BaseModel):
+class TimelineOut(BaseModel):
     dt: datetime
     text: str
 
@@ -55,8 +55,8 @@ class EventOut(BaseOutDBMSchema):
     author_oid: str 
     start_dt: datetime
     end_dt: datetime 
-    ratings: list[Rating] 
-    timeline: list[Timeline] 
+    ratings: list[RatingOut]
+    timeline: list[TimelineOut]
 
 
 class TeamOut(BaseOutDBMSchema):
@@ -77,7 +77,7 @@ class EventRequestOut(BaseOutDBMSchema):
     requestor_oid: str
     start_dt: datetime
     end_dt: datetime
-    timeline: list[Timeline]
+    timeline: list[TimelineOut]
 
 
 class FeedbackOut(BaseOutDBMSchema):
