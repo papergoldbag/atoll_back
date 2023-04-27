@@ -59,6 +59,32 @@ class EventOut(BaseOutDBMSchema):
     timeline: list[Timeline] 
 
 
+class TeamOut(BaseOutDBMSchema):
+    captain_oid: str
+    title: str
+    description: str
+    user_oids: list[str]
+
+
+class InviteOut(BaseOutDBMSchema):
+    from_team_oid: str
+    to_user_oid: str
+
+
+class EventRequestOut(BaseOutDBMSchema):
+    title: str
+    description: str
+    requestor_oid: str
+    start_dt: datetime
+    end_dt: datetime
+    timeline: list[Timeline]
+
+
+class FeedbackOut(BaseOutDBMSchema):
+    event_oid: str
+    user_oid: str
+    text: str
+    
 
 class UserOut(BaseOutDBMSchema):
     fullname: Optional[str] = None
