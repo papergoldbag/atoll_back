@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional, Any
 
 from bson import ObjectId
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel, Extra, Field
 
 
 class BaseSchema(BaseModel):

@@ -495,6 +495,8 @@ async def send_feedback(
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.sportsman]))
 ):
+    if feedback_in.rate<1 or feedback_in.rate>5:
+        raise HTTPException(status_code=400, detail="rate must be >=1 and <=5")
     event = await get_event(id_=feedback_in.event_int_id)
     if event is None:
         raise HTTPException(status_code=404, detail=f"event with int id {feedback_in.event_int_id} doesn't exists")
