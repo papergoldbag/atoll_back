@@ -14,6 +14,7 @@ from atoll_back.core import db, bot
 from atoll_back.db.base import Id
 from atoll_back.db.event import EventFields
 from atoll_back.db.mailcode import MailCodeFields
+from atoll_back.db.rating import RatingFields
 from atoll_back.db.user import UserFields
 from atoll_back.helpers import NotSet, is_set
 from atoll_back.models import User, MailCode, Event, Team, Rating, Timeline
@@ -281,7 +282,9 @@ async def create_mail_code(
 """RATINGS LOGIC"""
 
 async def get_ratings(event_oid: ObjectId) -> list[Rating]:
-    ratings: list[Rating] = [Rating.parse_document(x) for x in await db.rating.find_documents({"event_oid": event_oid})]
+    cursor = db.rating.create_cursor(filter_={RatingFields.event_oid: event_oid})
+
+    ratings: list[Rating] = [Rating.parse_document(x) async for x in await cursor]
     ratings.sort(key=lambda k: k.place)
     return ratings
 
