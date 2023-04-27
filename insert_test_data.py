@@ -19,7 +19,6 @@ async def insert_test_data():
         description="TEST",
         author_oid=users[0].oid,
         end_dt=datetime.utcnow() + timedelta(days=30),
-        ratings=[Rating(team_oid=ObjectId(), place=1)],
         timelines=[Timeline(
             dt=datetime.utcnow(),
             text='TEST TEXT'
