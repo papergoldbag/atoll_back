@@ -10,6 +10,7 @@ from atoll_back.db.event_request import EventRequestCollection
 from atoll_back.db.feedback import FeedbackCollection
 from atoll_back.db.invite import InviteCollection
 from atoll_back.db.mailcode import MailCodeCollection
+from atoll_back.db.rating import RatingCollection
 from atoll_back.db.team import TeamCollection
 from atoll_back.db.user import UserCollection
 
@@ -74,6 +75,12 @@ class DB:
             pymongo_db=self.pymongo_db
         )
         self.collections.append(self.feedback_collection)
+
+        self.rating = RatingCollection.from_mongo_db(
+            motor_db=self.motor_db,
+            pymongo_db=self.pymongo_db
+        )
+        self.collections.append(self.rating)
 
     async def ensure_all_indexes(self):
         self.log.info('ensuring all indexes')

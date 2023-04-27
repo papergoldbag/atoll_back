@@ -12,6 +12,7 @@ from atoll_back.consts import RolesType
 from atoll_back.db.base import BaseFields, Document
 from atoll_back.db.event import EventFields
 from atoll_back.db.mailcode import MailCodeFields
+from atoll_back.db.rating import RatingFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.event_request import EventRequestFields
 from atoll_back.db.invite import InviteFields
@@ -131,14 +132,19 @@ class Team(BaseDBM):
     users: list[User] = Field(default=[])
 
 
-class Rating(BaseDBM):
-    team_oid: ObjectId = Field(alias='team_oid')
-    place: int = Field(alias='place')
-
-
 class Timeline(BaseModel):
     dt: datetime = Field(alias='dt')
     text: str = Field(alias='text')
+
+
+class Rating(BaseDBM):
+    # db fields
+    event_oid: ObjectId = Field(alias=RatingFields.event_oid)
+    team_oid: ObjectId = Field(alias=RatingFields.team_oid)
+    place: int = Field(alias=RatingFields.place)
+
+    # direct linked models
+    event: Optional[Event] = Field(default=None)
 
 
 class Event(BaseDBM):
