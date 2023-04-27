@@ -224,9 +224,12 @@ async def find_team():
     ...
 
 
-@api_v1_router.get('/team.by_id', response_model=TeamOut,tags=['Team'])
+@api_v1_router.get('/team.by_id', response_model=Optional[TeamOut],tags=['Team'])
 async def get_team_by_id(id: int = Query(...)):
-    team_dict = (await get_team(id_=id)).dict()
+    team_dict = await get_team(id_=id)
+    if team_dict is None:
+        return None
+    team_dict = team_dict.dict()
     team_dict['users'] = [InTeamUser.parse_dbm_kwargs(**(await get_user(id_=x)).dict(), is_captain=True if x==team_dict['captain_oid'] else False) for x in team_dict['user_oids']]
     team_dict.pop('user_oids')
     team = TeamOut.parse_dbm_kwargs(**team_dict)
@@ -245,6 +248,15 @@ async def update_team():
 async def get_all_events():
     events = await get_events()
     return [EventOut.parse_dbm_kwargs(**event.dict(), ratings=await get_ratings(event_oid=event.oid)) for event in events]
+
+
+@api_v1_router.get('/event.by_id', response_model=Optional[EventOut], tags=['Event'])
+async def get_event_by_id(id: int = Query(...)):
+    event_d = await get_event(id_=id)
+    if event_d is None:
+        return None
+    event_d = event_d.dict()
+    return EventOut.parse_dbm_kwargs(**event_d, ratings=await get_ratings(event_oid=event_d['oid']))
 
 
 @api_v1_router.post('/event.update', tags=['Event'], deprecated=True)

@@ -74,6 +74,15 @@ class EventRequestOut(BaseOutDBMSchema):
     timeline: list[TimelineOut]
 
 
+class EventRequestIn(BaseSchemaIn):
+    title: str
+    description: str
+    requestor_oid: str
+    start_dt: datetime
+    end_dt: datetime
+    timeline: list[TimelineOut]
+
+
 class FeedbackOut(BaseOutDBMSchema):
     event_oid: str
     user_oid: str
