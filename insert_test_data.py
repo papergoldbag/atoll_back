@@ -12,7 +12,6 @@ from atoll_back.db.rating import RatingFields
 from atoll_back.db.team import TeamFields
 
 
-
 async def insert_test_data():
     setup_logging()
     await db.event_collection.remove_documents()
