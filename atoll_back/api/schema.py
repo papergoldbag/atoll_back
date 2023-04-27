@@ -38,6 +38,28 @@ class BaseSchemaIn(BaseSchema):
     pass
 
 
+class Rating(BaseModel):
+    place: str
+    team_int_id: int
+
+
+class Timeline(BaseModel):
+    dt: datetime
+    text: str
+
+
+class EventOut(BaseOutDBMSchema):
+    title: str
+    description: str 
+    team_ods: Optional[list[str]] 
+    author_oid: str 
+    start_dt: datetime
+    end_dt: datetime 
+    ratings: list[Rating] 
+    timeline: list[Timeline] 
+
+
+
 class UserOut(BaseOutDBMSchema):
     fullname: Optional[str] = None
     mail: str

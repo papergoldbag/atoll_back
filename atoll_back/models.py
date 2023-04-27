@@ -131,10 +131,16 @@ class Rating(BaseModel):
     team_oid: ObjectId
     place: int
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class Timeline(BaseModel):
     dt: datetime
     text: str
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class Event(BaseDBM):
