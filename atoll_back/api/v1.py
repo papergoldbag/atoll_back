@@ -6,7 +6,8 @@ from statistics import median, mean
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, FeedbackWithBody, InTeamUser, OperationStatusOut, RepresentativeRequestIn, RepresentativeRequestOut, SensitiveUserOut, TeamOut, TeamUpdate, \
+from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, FeedbackWithBody, InTeamUser, OperationStatusOut, \
+    RepresentativeRequestOut, SensitiveUserOut, TeamOut, TeamUpdate, \
     UserOut, UpdateUserIn, InviteOut,\
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamsOut
@@ -616,19 +617,25 @@ async def get_all_representative_request(
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin]))
     ):
-    repr_req = [RepresentativeRequestOut.parse_dbm_kwargs(**x.dict()) for x in await get_representative_requests()]
+    repr_req = []
+    for repr in await get_representative_requests():
+        repr_d = repr.dict()
+        repr_d['user'] = UserOut.parse_dbm_kwargs(**(await get_user(id_=repr.user_oid)).dict())
+        repr_req.append(RepresentativeRequestOut.parse_dbm_kwargs(**repr_d))
     return repr_req
 
 
 @api_v1_router.post('/representative_request.add', tags=['Representative request'], response_model=RepresentativeRequestOut)
 async def add_representative_request(
-    repr_req: RepresentativeRequestIn = Body(...),
     user: User = Depends(
         make_strict_depends_on_roles([UserRoles.sportsman]))):
     repr_req_db = await create_representative_request(
-        user_oid=repr_req.user_oid,
-        user_int_id=repr_req.user_int_id
+        user_oid=user.oid,
+        user_int_id=user.int_id
     )
-    return RepresentativeRequestOut.parse_dbm_kwargs(**repr_req_db.dict())
+    repr_d = repr_req_db.dict()
+    repr_d['user'] = UserOut.parse_dbm_kwargs(**repr_req_db.user.dict())
+    return RepresentativeRequestOut.parse_dbm_kwargs(
+        **repr_d)
 
 

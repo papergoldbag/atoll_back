@@ -618,7 +618,8 @@ async def create_representative_request(
     inserted_doc = await db.representative_requests_collection.insert_document(
         doc_to_insert
     )
-    created_repr_req = RepresentativeRequest.parse_document(inserted_doc)
+    created_repr_req: RepresentativeRequest = RepresentativeRequest.parse_document(inserted_doc)
+    created_repr_req.user = await get_user(id_=user_oid)
 
     return created_repr_req
 

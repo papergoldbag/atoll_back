@@ -185,15 +185,10 @@ class AuthUserIn(BaseSchemaIn):
 
 
 class RepresentativeRequestOut(BaseOutDBMSchema):
-    user_oid: ObjectId
+    user_oid: str
     user_int_id: int
 
     user: UserOut
-
-
-class RepresentativeRequestIn(BaseSchemaIn):
-    user_oid: ObjectId
-    user_int_id: int
 
 
 RepresentativeRequestOut.update_forward_refs()
