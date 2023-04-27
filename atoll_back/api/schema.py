@@ -38,12 +38,12 @@ class BaseSchemaIn(BaseSchema):
     pass
 
 
-class RatingOut(BaseModel):
+class RatingOut(BaseOutDBMSchema):
     place: str
     team_oid: str
 
 
-class TimelineOut(BaseModel):
+class TimelineOut(BaseOutDBMSchema):
     dt: datetime
     text: str
 
