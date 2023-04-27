@@ -46,7 +46,7 @@ class RatingOut(BaseOutDBMSchema):
 
 class RatingIn(BaseSchemaIn):
     place: int
-    team_oid: str
+    team_int_id: int
 
 
 class TimelineOut(BaseModel):
@@ -89,6 +89,11 @@ class EventRequestIn(BaseSchemaIn):
 class FeedbackOut(BaseOutDBMSchema):
     event_oid: str
     user_oid: str
+    text: str
+
+
+class FeedbackIn(BaseSchemaIn):
+    event_int_id: int
     text: str
 
 

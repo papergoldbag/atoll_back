@@ -19,7 +19,8 @@ from atoll_back.db.rating import RatingFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.user import UserFields
 from atoll_back.helpers import NotSet, is_set
-from atoll_back.models import User, MailCode, Event, Team, Rating, Timeline, EventRequest, EventRequestFields
+from atoll_back.models import User, MailCode, Event, Team, Rating, Timeline, \
+    EventRequest, EventRequestFields, Feedback, FeedbackFields
 from atoll_back.utils import roles_to_list
 
 """USER LOGIC"""
@@ -494,6 +495,37 @@ async def create_event(
     created_event = Event.parse_document(inserted_doc)
 
     return created_event
+
+
+"""FEEDBACK LOGIC"""
+
+
+async def create_feedback(
+        *,
+        event_oid: ObjectId,
+        user_oid: ObjectId,
+        text: str
+    ) -> Feedback:
+    doc_to_insert = {
+        FeedbackFields.event_oid: event_oid,
+        FeedbackFields.user_oid: user_oid,
+        FeedbackFields.text: text,
+    }
+    inserted_doc = await db.feedback_collection.insert_document(
+        doc_to_insert
+    )
+    created_feedback = Feedback.parse_document(inserted_doc)
+
+    return created_feedback
+
+    
+async def get_feedback():
+    ...
+
+    
+async def get_feedbacks():
+    ...
+
 
 
 async def example():

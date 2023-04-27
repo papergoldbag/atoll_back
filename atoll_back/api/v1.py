@@ -4,7 +4,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, \
+from atoll_back.api.schema import FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, \
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn
 from atoll_back.consts import MailCodeTypes, UserRoles
@@ -14,7 +14,8 @@ from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline, Rating
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
     remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
-    get_event_requests, get_event_request, event_request_to_event, create_team, create_rating
+    get_event_requests, get_event_request, event_request_to_event, create_team, create_rating, create_feedback, \
+    get_feedback, get_feedbacks
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -303,7 +304,8 @@ async def publish_ratings(
     if event is None:
         raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
     for rate in ratings:
-        await create_rating(event_oid=event.oid, team_oid=ObjectId(rate.team_oid), place=rate.place)
+        team = await get_team(id_=rate.team_int_id)
+        await create_rating(event_oid=event.oid, team_oid=team.oid, place=rate.place)
     event_d = event.dict()
     event_d['team_oids'] = [str(x) for x in event.team_oids]
     ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
@@ -311,9 +313,20 @@ async def publish_ratings(
     
 
 
-@api_v1_router.post('/event.send_feedback', tags=['Event'], deprecated=True)
-async def send_feedback():
-    ...
+@api_v1_router.post('/event.send_feedback', tags=['Event'], response_model=FeedbackOut)
+async def send_feedback(
+        feedback_in: FeedbackIn = Body(...),
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.sportsman]))
+    ):
+    event = await get_event(id_=feedback_in.event_int_id)
+    user = await get_user(id_=user.oid)
+    feedback = await create_feedback(
+        event_oid=event.oid,
+        user_oid=user.oid,
+        text=feedback_in.text
+    )
+    return FeedbackOut.parse_dbm_kwargs(**feedback.dict())
 
 
 @api_v1_router.get('/event.feedbacks', tags=['Event'], deprecated=True)
@@ -325,11 +338,21 @@ async def get_event_feedbacks(
 
 @api_v1_router.get('/event.get_all_requests_to_create_event', tags=['Event'], response_model=list[EventRequestOut])
 async def get_all_event_requests(
+        requestor_int_id: Optional[int] = Query(...),
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin])
         )
 ):
     ev_req = await get_event_requests()
+    if not requestor_int_id is None:
+        requestor = await get_user(id_=requestor_int_id)
+        if requestor is None:
+            raise HTTPException(status_code=400, detail="requestor is None")
+        res = []
+        for event in ev_req:
+            if event.requestor_oid == requestor.oid:
+                res.append(EventRequestOut.parse_dbm_kwargs(**event.dict()))
+        return res
     return [EventRequestOut.parse_dbm_kwargs(**event.dict()) for event in
             ev_req]
 
