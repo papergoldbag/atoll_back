@@ -250,7 +250,7 @@ async def send_team_invite(
     if not curr_user.oid == team.captain_oid:
         raise HTTPException(status_code=400, detail="u are not captain of team")
 
-    if not await get_invite(
+    if await get_invite(
         from_team_oid=team.oid,
         to_user_oid=user.oid
     ) is None:
