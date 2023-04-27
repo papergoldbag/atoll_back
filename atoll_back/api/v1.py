@@ -2,16 +2,17 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
-from atoll_back.api.deps import get_strict_current_user
-from atoll_back.api.schema import InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, UserExistsStatusOut, \
-    RegUserIn, AuthUserIn, EventOut, RatingOut
-from atoll_back.consts import MailCodeTypes
+from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
+from atoll_back.api.schema import InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, \
+    UserExistsStatusOut, \
+    RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut
+from atoll_back.consts import MailCodeTypes, UserRoles
 from atoll_back.core import db
 from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
-from atoll_back.models import User, Event, Team
+from atoll_back.models import User, Event, Team, Timeline
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
-    remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event
+    remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -238,13 +239,14 @@ async def get_team_by_id(int_id: int = Query(...)):
     return TeamOut.parse_dbm_kwargs(**team_dict)
 
 
-"""Event"""
+"""EVENT"""
 
 
 @api_v1_router.get('/event.all', response_model=list[EventOut], tags=['Event'])
 async def get_all_events(user: User = Depends(get_strict_current_user)):
     events = await get_events()
-    return [EventOut.parse_dbm_kwargs(**event.dict(), ratings=await get_ratings(event_oid=event.oid)) for event in events]
+    return [EventOut.parse_dbm_kwargs(**event.dict(), ratings=await get_ratings(event_oid=event.oid)) for event in
+            events]
 
 
 @api_v1_router.get("/event.join", deprecated=True, tags=["Me"])
@@ -276,9 +278,21 @@ async def get_event_feedbacks():
     ...
 
 
-@api_v1_router.get('/event.requests_to_create', tags=['Event'], deprecated=True)
-async def get_event_requests():
-    ...
+@api_v1_router.post('/event.requests_to_create', tags=['Event'], response_model=EventRequestOut)
+async def add_event_requests(
+        event_data: EventRequestIn = Body(...),
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner]))
+):
+    req = await create_event_request(
+        title=event_data.title,
+        description=event_data.description,
+        requestor_oid=user.oid,
+        start_dt=event_data.start_dt,
+        end_dt=event_data.end_dt,
+        timeline=[Timeline(dt=t.dt, text=t.text) for t in event_data.timeline],
+    )
+    return EventRequestOut.parse_dbm_kwargs(**(req.dict()))
 
 
 @api_v1_router.get('/event.accept_request_to_create', tags=['Event'], deprecated=True)
