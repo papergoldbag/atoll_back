@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user
@@ -186,20 +188,23 @@ async def find_user_by_name(q: str = Query(...), user: User = Depends(get_strict
 
 @api_v1_router.get('/user.all', response_model=list[UserOut], tags=['User'])
 async def get_all_users(user: User = Depends(get_strict_current_user)):
-    return [UserOut.parse_dbm_kwargs(x) for x in await get_users()]
+    return [UserOut.parse_dbm_kwargs(**user.dict()) for user in await get_users()]
 
 
-@api_v1_router.get('/user.by_id', response_model=UserOut, tags=['User'])
+@api_v1_router.get('/user.by_id', response_model=Optional[UserOut], tags=['User'])
 async def get_user_by_int_id(int_id: int, user: User = Depends(get_strict_current_user)):
-    return UserOut.parse_dbm_kwargs(**(await get_user(id_=int_id)).dict())
+    user = await get_user(id_=int_id)
+    if user is None:
+        return None
+    return UserOut.parse_dbm_kwargs(**user.dict())
 
 
-@api_v1_router.post('/user.team_request', response_model=OperationStatusOut, tags=['User'])
+@api_v1_router.post('/user.team_request', response_model=OperationStatusOut, tags=['User'], deprecated=True)
 async def send_team_invite():
     ...
 
 
-@api_v1_router.post('/user.edit_role', response_model=OperationStatusOut, tags=['User'])
+@api_v1_router.post('/user.edit_role', response_model=OperationStatusOut, tags=['User'], deprecated=True)
 async def edit_user_role():
     ...
 
@@ -207,17 +212,17 @@ async def edit_user_role():
 """TEAM"""
 
 
-@api_v1_router.get('/team.find', tags=['Team'])
+@api_v1_router.get('/team.find', tags=['Team'], deprecated=True)
 async def find_team():
     ...
 
 
-@api_v1_router.get('/team.by_id', tags=['Team'])
+@api_v1_router.get('/team.by_id', tags=['Team'], deprecated=True)
 async def get_team_by_id():
     ...
 
 
-@api_v1_router.post('/team.update', tags=['Team'])
+@api_v1_router.post('/team.update', tags=['Team'], deprecated=True)
 async def update_team():
     ...
 
@@ -225,56 +230,56 @@ async def update_team():
 """Event"""
 
 
-@api_v1_router.get('/event.all', response_model=list[EventOut],tags=['Event'])
+@api_v1_router.get('/event.all', response_model=list[EventOut], tags=['Event'])
 async def get_all_events():
-    return [EventOut.parse_dbm_kwargs(**x.dict()) for x in (await get_events())]
+    return [EventOut.parse_dbm_kwargs(**event.dict()) for event in (await get_events())]
 
 
-@api_v1_router.post('/event.update', tags=['Event'])
+@api_v1_router.post('/event.update', tags=['Event'], deprecated=True)
 async def update_event():
     ...
 
 
-@api_v1_router.post('/event.request', tags=['Event'])
+@api_v1_router.post('/event.request', tags=['Event'], deprecated=True)
 async def add_event_request():
     ...
 
 
-@api_v1_router.get('/event.teams', tags=['Event'])
+@api_v1_router.get('/event.teams', tags=['Event'], deprecated=True)
 async def get_event_teams():
     ...
 
 
-@api_v1_router.get('/event.ratings', tags=['Event'])
+@api_v1_router.get('/event.ratings', tags=['Event'], deprecated=True)
 async def get_event_ratings():
     ...
 
 
-@api_v1_router.post('/event.publish_ratings', tags=['Event'])
+@api_v1_router.post('/event.publish_ratings', tags=['Event'], deprecated=True)
 async def publish_ratings():
     ...
 
 
-@api_v1_router.get('/event.join', tags=['Event'])
+@api_v1_router.get('/event.join', tags=['Event'], deprecated=True)
 async def join_event():
     ...
 
 
-@api_v1_router.post('/event.feedback', tags=['Event'])
+@api_v1_router.post('/event.feedback', tags=['Event'], deprecated=True)
 async def send_feedback():
     ...
 
 
-@api_v1_router.get('/event.feedbacks', tags=['Event'])
+@api_v1_router.get('/event.feedbacks', tags=['Event'], deprecated=True)
 async def get_event_feedbacks():
     ...
 
 
-@api_v1_router.get('/event.requests', tags=['Event'])
+@api_v1_router.get('/event.requests', tags=['Event'], deprecated=True)
 async def get_event_requests():
     ...
 
 
-@api_v1_router.get('/event.accept_request', tags=['Event'])
+@api_v1_router.get('/event.accept_request', tags=['Event'], deprecated=True)
 async def accept_event_request():
     ...

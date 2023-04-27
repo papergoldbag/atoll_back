@@ -11,6 +11,8 @@ from atoll_back.services import get_user
 
 async def get_current_user(*, ac: HTTPAuthorizationCredentials = Security(HTTPBearer())) -> Optional[User]:
     user = await get_user(token=ac.credentials)
+    if user is None:
+        return None
     user.misc_data['current_token'] = ac.credentials
     if user is None:
         return None
