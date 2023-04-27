@@ -13,7 +13,7 @@ from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
     remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
-    get_event_requests, get_event_request, event_request_to_event
+    get_event_requests, get_event_request, event_request_to_event, create_team
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -246,17 +246,38 @@ async def get_team_by_id(int_id: int = Query(...)):
 @api_v1_router.get('/event.all', response_model=list[EventOut], tags=['Event'])
 async def get_all_events(user: User = Depends(get_strict_current_user)):
     events = await get_events()
-    return [EventOut.parse_dbm_kwargs(**event.dict(), ratings=await get_ratings(event_oid=event.oid)) for event in
-            events]
+    events_out = []
+    for event in events:
+        event_d = event.dict()
+        event_d['team_oids'] = [str(x) for x in event.team_oids]
+        ratings = await get_ratings(event_oid=event.oid)
+        events_out.append(EventOut.parse_dbm_kwargs(**event_d, ratings=ratings))
 
 
-@api_v1_router.get("/event.join", deprecated=True, tags=["Me"])
+    return events_out
+
+
+@api_v1_router.get("/event.join", response_model=TeamOut, tags=["Me"])
 async def event_join(
-        user: User = Depends(get_strict_current_user),
+        user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
         event_int_id: int = Query(...)
 ):
-    # TODO
-    ...
+    event = await get_event(id_=event_int_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
+    event_teams = event.team_oids
+    for team_oid in event_teams:
+        team_e = await get_team(id_=team_oid)
+        if user.oid in team_e.user_oids:
+            raise HTTPException(status_code=400, detail="u already in event in team")
+    team = await create_team(
+        captain_oid=user.oid,
+        title=user.fullname + " team",
+        description=""
+    )
+    team.users = [InTeamUser.parse_dbm_kwargs(**u.dict(), is_captain=u.oid==team.captain_oid) for u in team.users]
+    await db.event_collection.update_document_by_id(id_=event.oid, push={EventFields.team_oids:team.oid})
+    return TeamOut.parse_dbm_kwargs(**(team.dict()))
 
 
 @api_v1_router.get('/event.get_by_int_id', response_model=Optional[EventOut], tags=['Event'])

@@ -52,7 +52,7 @@ class TimelineOut(BaseModel):
 class EventOut(BaseOutDBMSchema):
     title: str
     description: str
-    team_ods: Optional[list[str]]
+    team_oids: Optional[list[str]]
     start_dt: datetime
     end_dt: datetime
     timeline: list[TimelineOut]

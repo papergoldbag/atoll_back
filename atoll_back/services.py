@@ -300,11 +300,14 @@ async def create_team(
         captain_oid: ObjectId,
         title: str,
         description: str,
-        user_oids: list[ObjectId]
+        user_oids: list[ObjectId] = None
 ) -> Team:
     captain = await get_user(id_=captain_oid)
     if captain is None:
         raise ValueError("captain is None")
+
+    if user_oids is None:
+        user_oids = [captain.oid]
 
     users = [await get_user(id_=user_oid) for user_oid in user_oids]
     if None in users:
@@ -317,7 +320,7 @@ async def create_team(
         TeamFields.user_oids: user_oids
     }
     inserted_doc = await db.team_collection.insert_document(doc_to_insert)
-    created_team = Team.parse_document(inserted_doc)
+    created_team: Team = Team.parse_document(inserted_doc)
 
     created_team.captain = captain
     created_team.users = users
