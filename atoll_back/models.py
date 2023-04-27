@@ -96,6 +96,7 @@ class User(BaseDBM):
     tg_username: Optional[str] = Field(alias=UserFields.tg_username)
     tg_id: Optional[str] = Field(alias=UserFields.tg_username)
     roles: list[str] = Field(alias=UserFields.roles, default=[])
+    description: Optional[str] = Field(alias=UserFields.description)
 
     # direct linked models
     # ...

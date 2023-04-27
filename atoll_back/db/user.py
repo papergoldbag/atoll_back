@@ -11,6 +11,7 @@ class UserFields(BaseFields):
     tg_id = "tg_id"
     tg_username = "tg_username"
     roles = "roles"
+    description = "description"
 
 
 class UserCollection(BaseCollection):
