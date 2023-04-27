@@ -1,0 +1,13 @@
+[Unit]
+Description=tg_bot
+After=network.target
+
+[Service]
+User=back
+WorkingDirectory=/home/back/voronezh
+ExecStart=/home/back/voronezh/.venv/bin/python3 /home/back/voronezh/start_tg_bot.py
+RestartSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=api
+After=network.target
+
+[Service]
+User=back
+WorkingDirectory=/home/back/voronezh
+ExecStart=/home/back/voronezh/.venv/bin/uvicorn voronezh.api.asgi:app --host 127.0.0.1 --port 8080 --workers 2
+RestartSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
