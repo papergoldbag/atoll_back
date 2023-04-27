@@ -1,19 +1,20 @@
 from typing import Optional
+from bson import ObjectId
 
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
 from atoll_back.api.schema import InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, \
     UserExistsStatusOut, \
-    RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut
+    RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn
 from atoll_back.consts import MailCodeTypes, UserRoles
 from atoll_back.core import db
 from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
-from atoll_back.models import User, Event, Team, Timeline
+from atoll_back.models import User, Event, Team, Timeline, Rating
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
     remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
-    get_event_requests, get_event_request, event_request_to_event, create_team
+    get_event_requests, get_event_request, event_request_to_event, create_team, create_rating
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -250,7 +251,7 @@ async def get_all_events(user: User = Depends(get_strict_current_user)):
     for event in events:
         event_d = event.dict()
         event_d['team_oids'] = [str(x) for x in event.team_oids]
-        ratings = await get_ratings(event_oid=event.oid)
+        ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
         events_out.append(EventOut.parse_dbm_kwargs(**event_d, ratings=ratings))
 
 
@@ -287,13 +288,27 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
         return None
     event_d = event.dict()
     event_d['team_oids'] = [str(x) for x in event.team_oids]
-    ratings = await get_ratings(event_oid=event.oid)
-    return EventOut.parse_dbm_kwargs(**event_d, ratings=await get_ratings(event_oid=event_d['oid']))
+    ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
+    return EventOut.parse_dbm_kwargs(**event_d, ratings=ratings)
 
 
-@api_v1_router.post('/event.publish_ratings', tags=['Rating'], deprecated=True)
-async def publish_ratings():
-    ...
+@api_v1_router.post('/event.publish_ratings', tags=['Rating'], response_model=EventOut)
+async def publish_ratings(
+        event_int_id: int = Body(...),
+        ratings: list[RatingIn] = Body(...),
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner]))
+    ):
+    event = await get_event(id_=event_int_id)    
+    if event is None:
+        raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
+    for rate in ratings:
+        await create_rating(event_oid=event.oid, team_oid=ObjectId(rate.team_oid), place=rate.place)
+    event_d = event.dict()
+    event_d['team_oids'] = [str(x) for x in event.team_oids]
+    ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
+    return EventOut.parse_dbm_kwargs(**event_d, ratings=ratings)
+    
 
 
 @api_v1_router.post('/event.send_feedback', tags=['Event'], deprecated=True)
@@ -346,4 +361,7 @@ async def accept_event_request(
     if ev_req is None:
         raise HTTPException(status_code=400, detail=f"event request with int id {event_request_int_id} doesn't exists")
     event = await event_request_to_event(event_request_oid=ev_req.oid)
-    return EventOut.parse_dbm_kwargs(**(event.dict()), ratings=await get_ratings(event_oid=event.oid))
+    return EventOut.parse_dbm_kwargs(
+        **(event.dict()), 
+        ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
+    )

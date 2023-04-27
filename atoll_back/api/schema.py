@@ -44,6 +44,11 @@ class RatingOut(BaseOutDBMSchema):
     team_oid: str
 
 
+class RatingIn(BaseSchemaIn):
+    place: int
+    team_oid: str
+
+
 class TimelineOut(BaseModel):
     dt: datetime
     text: str
