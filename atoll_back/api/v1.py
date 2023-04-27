@@ -233,7 +233,8 @@ async def update_team():
 
 @api_v1_router.get('/event.all', response_model=list[EventOut], tags=['Event'])
 async def get_all_events():
-    ...
+    events = await get_events()
+    return [EventOut.parse_dbm_kwargs(**event.dict()) for event in events]
 
 
 @api_v1_router.post('/event.update', tags=['Event'], deprecated=True)

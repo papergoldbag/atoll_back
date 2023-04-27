@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, Any
 
+from bson import ObjectId
 from pydantic import BaseModel, Extra
 
 
@@ -20,13 +21,26 @@ class BaseOutDBMSchema(BaseSchemaOut):
     int_id: int
     created: datetime
 
+    @classmethod
+    def parse_dbm_kwargs(
+            cls,
+            **kwargs
+    ):
+        res = {}
+        for k, v in kwargs.items():
+            if isinstance(v, ObjectId):
+                v = str(v)
+            res[k] = v
+        return cls(**res)
+
 
 class BaseSchemaIn(BaseSchema):
     pass
 
 
 class RatingOut(BaseOutDBMSchema):
-    place: str
+    event_oid: str
+    place: int
     team_oid: str
 
 
@@ -37,12 +51,11 @@ class TimelineOut(BaseModel):
 
 class EventOut(BaseOutDBMSchema):
     title: str
-    description: str 
-    team_ods: Optional[list[str]] 
-    author_oid: str 
+    description: str
+    team_ods: Optional[list[str]]
+    author_oid: str
     start_dt: datetime
-    end_dt: datetime 
-    ratings: list[RatingOut]
+    end_dt: datetime
     timeline: list[TimelineOut]
 
 
@@ -71,7 +84,7 @@ class FeedbackOut(BaseOutDBMSchema):
     event_oid: str
     user_oid: str
     text: str
-    
+
 
 class UserOut(BaseOutDBMSchema):
     fullname: Optional[str] = None
