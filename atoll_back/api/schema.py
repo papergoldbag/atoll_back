@@ -107,6 +107,11 @@ class FeedbackOut(BaseOutDBMSchema):
     text: str
 
 
+class FeedbackWithBody(FeedbackOut):
+    event: EventOut
+    user: UserOut
+
+
 class FeedbackIn(BaseSchemaIn):
     event_int_id: int
     text: str
@@ -176,3 +181,4 @@ class AuthUserIn(BaseSchemaIn):
 
 EventWithTeamsOut.update_forward_refs()
 InviteOut.update_forward_refs()
+FeedbackWithBody.update_forward_refs()
