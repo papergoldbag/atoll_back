@@ -9,9 +9,10 @@ from atoll_back.consts import TgBotCommands
 from atoll_back.core import dp
 from atoll_back.tg_bot.filters import RoleFilter
 from atoll_back.tg_bot.keyboards import base_user_keyboard
-from atoll_back.tg_bot.utils import get_event_description
+from atoll_back.tg_bot.utils import get_event_description, get_my_event
 from atoll_back.tg_bot.states import UserStates
 from atoll_back.services import get_user, get_events
+from atoll_back.models import User
 
 log = logging.getLogger(__name__)
 
@@ -39,6 +40,18 @@ async def on_btn_event(message: types.Message):
         
     for event in events:
          await message.answer(await get_event_description(event))
+
+@dp.message_handler(text = "Мои события", state=[UserStates.authorized])
+async def on_btn_event(message: types.Message):
+    user: User = await get_user(tg_username=message.from_user.username)
+    events = await get_my_event(useroid=user.oid)
+    if len(events) == 0:
+        await message.answer("Вы не участвуете в мероприятиях!")
+    else:
+        await message.answer(emoji.emojize(":calendar: Запланированы следующие мероприятия :calendar:\n"))
+        for event in events:
+            await message.answer(await get_event_description(event))
+
 
 def import_handlers():
     log.info('handlers were imported')
