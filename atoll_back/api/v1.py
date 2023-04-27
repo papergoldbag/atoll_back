@@ -234,7 +234,7 @@ async def get_user_by_int_id(int_id: int, user: User = Depends(get_strict_curren
     return UserOut.parse_dbm_kwargs(**user.dict())
 
 
-@api_v1_router.get('/user.send_team_invite', response_model=OperationStatusOut, tags=['User'], deprecated=True)
+@api_v1_router.get('/user.send_team_invite', response_model=OperationStatusOut, tags=['User'])
 async def send_team_invite(
         curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
         from_team_int_id: int = Query(...),
@@ -255,6 +255,8 @@ async def send_team_invite(
         to_user_oid=user.oid
     ) is None:
         raise HTTPException(status_code=400, detail='invite already exists')
+    
+    await send_from_tg_bot(text=f"Вас пригласили в команду {team.title}.", to_user_ids=[user.oid])
 
     invite = await create_invite(from_team_oid=team.oid, to_user_oid=user.oid)
     return OperationStatusOut(is_done=True)
