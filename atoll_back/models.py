@@ -129,6 +129,7 @@ class Team(BaseDBM):
 
     # direct linked models
     users: list[User] = Field(default=[])
+    captain: Optional[User] = Field(default=None)
 
 
 class Timeline(BaseModel):

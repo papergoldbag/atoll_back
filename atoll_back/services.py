@@ -307,6 +307,9 @@ async def create_team(
     inserted_doc = await db.team_collection.insert_document(doc_to_insert)
     created_team = Team.parse_document(inserted_doc)
 
+    created_team.captain = captain
+    created_team.users = users
+
     return created_team
 
 
