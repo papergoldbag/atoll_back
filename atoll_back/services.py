@@ -18,7 +18,7 @@ from atoll_back.db.rating import RatingFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.user import UserFields
 from atoll_back.helpers import NotSet, is_set
-from atoll_back.models import User, MailCode, Event, Team, Rating, Timeline
+from atoll_back.models import User, MailCode, Event, Team, Rating, Timeline, EventRequest, EventRequestFields
 from atoll_back.utils import roles_to_list
 
 """USER LOGIC"""
@@ -359,6 +359,48 @@ async def get_ratings(*, event_oid: Optional[ObjectId] = None) -> list[Rating]:
     ratings: list[Rating] = [Rating.parse_document(doc) async for doc in cursor]
     ratings.sort(key=lambda k: k.place)
     return ratings
+
+
+"""EVENT REQUESTS LOGIC"""
+
+
+async def create_event_request(
+        *,
+        title: str,
+        description: str,
+        team_oids: list[ObjectId] = None,
+        requestor_oid: ObjectId,
+        start_dt: datetime = None,
+        end_dt: datetime,
+        timelines: list[Timeline] = None
+) -> EventRequest:
+    if start_dt is None:
+        start_dt = datetime.utcnow()
+
+    if timelines is None:
+        timelines = []
+
+    if team_oids is None:
+        team_oids = []
+
+    requestor = await get_user(id_=requestor_oid)
+    if requestor is None:
+        raise ValueError("requestor is None")
+
+    doc_to_insert = {
+        EventRequestFields.title: title,
+        EventRequestFields.description: description,
+        EventRequestFields.requestor_oid: requestor_oid,
+        EventRequestFields.start_dt: start_dt,
+        EventRequestFields.end_dt: end_dt,
+        EventRequestFields.timeline: [t.dict() for t in timelines]
+    }
+    inserted_doc = await db.event_request_collection.insert_document(
+        doc_to_insert
+    )
+    created_event_request = EventRequest.parse_document(inserted_doc)
+
+    return created_event_request
 
 
 """EVENT LOGIC"""
