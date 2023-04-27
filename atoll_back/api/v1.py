@@ -4,9 +4,10 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, \
+from atoll_back.api.schema import FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, \
+    UserOut, UpdateUserIn, \
     UserExistsStatusOut, \
-    RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn
+    RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamOut
 from atoll_back.consts import MailCodeTypes, UserRoles
 from atoll_back.core import db
 from atoll_back.db.event import EventFields
@@ -255,7 +256,6 @@ async def get_all_events(user: User = Depends(get_strict_current_user)):
         ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
         events_out.append(EventOut.parse_dbm_kwargs(**event_d, ratings=ratings))
 
-
     return events_out
 
 
@@ -277,12 +277,12 @@ async def event_join(
         title=user.fullname + " team",
         description=""
     )
-    team.users = [InTeamUser.parse_dbm_kwargs(**u.dict(), is_captain=u.oid==team.captain_oid) for u in team.users]
-    await db.event_collection.update_document_by_id(id_=event.oid, push={EventFields.team_oids:team.oid})
+    team.users = [InTeamUser.parse_dbm_kwargs(**u.dict(), is_captain=(u.oid == team.captain_oid)) for u in team.users]
+    await db.event_collection.update_document_by_id(id_=event.oid, push={EventFields.team_oids: team.oid})
     return TeamOut.parse_dbm_kwargs(**(team.dict()))
 
 
-@api_v1_router.get('/event.get_by_int_id', response_model=Optional[EventOut], tags=['Event'])
+@api_v1_router.get('/event.get_by_int_id', response_model=Optional[EventWithTeamOut], tags=['Event'])
 async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_strict_current_user)):
     event = await get_event(id_=int_id)
     if event is None:
@@ -290,7 +290,14 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
     event_d = event.dict()
     event_d['team_oids'] = [str(x) for x in event.team_oids]
     ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
-    return EventOut.parse_dbm_kwargs(**event_d, ratings=ratings)
+    return EventWithTeamOut.parse_dbm_kwargs(
+        **event_d,
+        ratings=ratings,
+        team=[TeamOut.parse_dbm_kwargs(
+            **team.dict(),
+            users=[InTeamUser.parse_dbm_kwargs(**u.dict(), is_captain=(u.oid == team.captain_oid)) for u in team.users]
+        ) for team in await get_teams() if team.oid in event.team_oids]
+    )
 
 
 @api_v1_router.post('/event.publish_ratings', tags=['Rating'], response_model=EventOut)
@@ -299,8 +306,8 @@ async def publish_ratings(
         ratings: list[RatingIn] = Body(...),
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner]))
-    ):
-    event = await get_event(id_=event_int_id)    
+):
+    event = await get_event(id_=event_int_id)
     if event is None:
         raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
     for rate in ratings:
@@ -310,7 +317,6 @@ async def publish_ratings(
     event_d['team_oids'] = [str(x) for x in event.team_oids]
     ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
     return EventOut.parse_dbm_kwargs(**event_d, ratings=ratings)
-    
 
 
 @api_v1_router.post('/event.send_feedback', tags=['Event'], response_model=FeedbackOut)
@@ -318,7 +324,7 @@ async def send_feedback(
         feedback_in: FeedbackIn = Body(...),
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.sportsman]))
-    ):
+):
     event = await get_event(id_=feedback_in.event_int_id)
     user = await get_user(id_=user.oid)
     feedback = await create_feedback(
@@ -385,6 +391,6 @@ async def accept_event_request(
         raise HTTPException(status_code=400, detail=f"event request with int id {event_request_int_id} doesn't exists")
     event = await event_request_to_event(event_request_oid=ev_req.oid)
     return EventOut.parse_dbm_kwargs(
-        **(event.dict()), 
-        ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
+        **(event.dict()),
+        ratings=[RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
     )

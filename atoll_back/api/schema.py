@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional, Any
 
@@ -62,6 +64,10 @@ class EventOut(BaseOutDBMSchema):
     end_dt: datetime
     timeline: list[TimelineOut]
     ratings: list[RatingOut]
+
+
+class EventWithTeamOut(EventOut):
+    team: list[TeamOut]
 
 
 class InviteOut(BaseOutDBMSchema):
