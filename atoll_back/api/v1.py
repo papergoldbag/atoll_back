@@ -308,6 +308,10 @@ async def add_event_requests(
 
 
 @api_v1_router.get('/event.accept_request_to_create', tags=['Event'], deprecated=True)
-async def accept_event_request():
+async def accept_event_request(
+        event_request_int_id: int = Query(...),
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.admin]))
+):
     # TODO
     ...
