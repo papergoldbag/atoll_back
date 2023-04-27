@@ -1,11 +1,9 @@
-import pymongo
-
 from atoll_back.db.base import BaseCollection, BaseFields
 
 
 class FeedbackFields(BaseFields):
-    event_id = "event_id"
-    user_id = "user_id"
+    event_oid = "event_oid"
+    user_oid = "user_iid"
     text = "text"
 
 

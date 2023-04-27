@@ -10,13 +10,10 @@ from pydantic.fields import ModelField
 
 from atoll_back.consts import RolesType
 from atoll_back.db.base import BaseFields, Document
-from atoll_back.db.mailcode import MailCodeFields
-from atoll_back.db.user import UserFields
-from atoll_back.db.event_request import EventRequestFields
 from atoll_back.db.event import EventFields
-from atoll_back.db.feedback import FeedbackFields
+from atoll_back.db.mailcode import MailCodeFields
 from atoll_back.db.team import TeamFields
-from atoll_back.db.invite import InviteFields
+from atoll_back.db.user import UserFields
 from atoll_back.utils import roles_to_list
 
 
@@ -121,19 +118,35 @@ class MailCode(BaseDBM):
 
 
 class Team(BaseDBM):
-    #db_fields
+    # db_fields
     title: str = Field(alias=TeamFields.title)
     description: str = Field(alias=TeamFields.description)
-    user_ids: str = Field(alias=TeamFields.user_ids)
+    user_ids: str = Field(alias=TeamFields.user_oids)
+
+    # direct linked models
+    users: list[User] = Field(default=[])
+
+
+class Rating(BaseModel):
+    team_oid: ObjectId
+    place: int
+
+
+class Timeline(BaseModel):
+    dt: datetime
+    text: str
 
 
 class Event(BaseDBM):
-    #db fields
+    # db fields
     title: str = Field(alias=EventFields.title)
     description: str = Field(alias=EventFields.title)
     team_ids: Optional[list[int]] = Field(alias=EventFields.team_ids)
-    creator_id: int = Field(alias=EventFields.creator_id)
+    creator_id: int = Field(alias=EventFields.author_id)
     start_dt: datetime = Field(alias=EventFields.start_dt)
     end_dt: datetime = Field(alias=EventFields.end_dt)
-    ratings: list[tuple] = Field(alias=EventFields.ratings)
-    timeline: list[tuple] = Field(alias=EventFields.timeline)
+    ratings: list[Rating] = Field(alias=EventFields.ratings)
+    timeline: list[Timeline] = Field(alias=EventFields.timeline)
+
+    # direct linked models
+    users: list[User] = Field(default=[])

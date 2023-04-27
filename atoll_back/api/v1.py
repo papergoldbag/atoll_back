@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user
-from atoll_back.api.schema import OperationStatusOut, SensitiveUserOut, UserOut, UpdateUserIn, ExistsStatusOut, \
-    UserExistsStatusOut, RegUserIn, AuthUserIn
+from atoll_back.api.schema import OperationStatusOut, SensitiveUserOut, UserOut, UpdateUserIn, UserExistsStatusOut, \
+    RegUserIn, AuthUserIn
 from atoll_back.consts import MailCodeTypes
 from atoll_back.core import db
 from atoll_back.db.user import UserFields
@@ -95,7 +95,7 @@ async def send_auth_code(to_mail: str = Query(...)):
 
 @api_v1_router.post("/auth", response_model=SensitiveUserOut, tags=["Auth"])
 async def auth(
-    auth_user_in: AuthUserIn = Body()
+        auth_user_in: AuthUserIn = Body()
 ):
     mail_codes = await get_mail_codes(to_mail=auth_user_in.mail, code=auth_user_in.code)
     if not mail_codes:
@@ -215,7 +215,7 @@ async def find_team():
 @api_v1_router.get('/team.by_id', tags=['Team'])
 async def get_team_by_id():
     ...
-    
+
 
 @api_v1_router.post('/team.update', tags=['Team'])
 async def update_team():
@@ -233,17 +233,17 @@ async def get_all_events():
 @api_v1_router.post('/event.update', tags=['Event'])
 async def update_event():
     ...
-    
+
 
 @api_v1_router.post('/event.request', tags=['Event'])
 async def add_event_request():
     ...
-    
+
 
 @api_v1_router.get('/event.teams', tags=['Event'])
 async def get_event_teams():
     ...
-    
+
 
 @api_v1_router.get('/event.ratings', tags=['Event'])
 async def get_event_ratings():
@@ -253,27 +253,27 @@ async def get_event_ratings():
 @api_v1_router.post('/event.publish_ratings', tags=['Event'])
 async def publish_ratings():
     ...
-    
+
 
 @api_v1_router.get('/event.join', tags=['Event'])
 async def join_event():
     ...
-    
+
 
 @api_v1_router.post('/event.feedback', tags=['Event'])
 async def send_feedback():
     ...
-    
+
 
 @api_v1_router.get('/event.feedbacks', tags=['Event'])
 async def get_event_feedbacks():
-    ...    
+    ...
 
 
 @api_v1_router.get('/event.requests', tags=['Event'])
 async def get_event_requests():
     ...
-    
+
 
 @api_v1_router.get('/event.accept_request', tags=['Event'])
 async def accept_event_request():

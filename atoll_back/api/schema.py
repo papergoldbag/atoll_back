@@ -78,4 +78,3 @@ class RegUserIn(BaseSchemaIn):
 class AuthUserIn(BaseSchemaIn):
     mail: str
     code: str
-

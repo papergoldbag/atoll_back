@@ -5,13 +5,13 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure, ConnectionFailure
 
-from atoll_back.db.mailcode import MailCodeCollection
-from atoll_back.db.user import UserCollection
-from atoll_back.db.event_request import EventRequestCollection
 from atoll_back.db.event import EventCollection
+from atoll_back.db.event_request import EventRequestCollection
 from atoll_back.db.feedback import FeedbackCollection
-from atoll_back.db.team import TeamCollection
 from atoll_back.db.invite import InviteCollection
+from atoll_back.db.mailcode import MailCodeCollection
+from atoll_back.db.team import TeamCollection
+from atoll_back.db.user import UserCollection
 
 
 class CannotConnectToDb(Exception):
