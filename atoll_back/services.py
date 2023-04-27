@@ -72,7 +72,7 @@ async def update_user(
         if is_set(tg_username):
             user.tg_username = tg_username
         if is_set(description):
-            user.tg_username = description
+            user.description = description
 
     return user
 
