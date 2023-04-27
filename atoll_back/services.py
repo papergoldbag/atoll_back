@@ -284,7 +284,7 @@ async def create_mail_code(
 async def get_ratings(event_oid: ObjectId) -> list[Rating]:
     cursor = db.rating.create_cursor(filter_={RatingFields.event_oid: event_oid})
 
-    ratings: list[Rating] = [Rating.parse_document(x) async for x in await cursor]
+    ratings: list[Rating] = [Rating.parse_document(x) async for x in cursor]
     ratings.sort(key=lambda k: k.place)
     return ratings
 
