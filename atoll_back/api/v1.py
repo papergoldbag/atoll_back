@@ -13,7 +13,7 @@ from atoll_back.core import db
 from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline, Rating
-from atoll_back.services import create_invite, get_invite, get_invites, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
+from atoll_back.services import accept_invite, create_invite, get_invite, get_invites, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
     remove_mail_code, send_from_tg_bot, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
     get_event_requests, get_event_request, event_request_to_event, create_team, create_rating, create_feedback, \
     get_feedback, get_feedbacks
@@ -187,9 +187,21 @@ async def get_my_invites(user: User = Depends(get_strict_current_user)):
     return [InviteOut.parse_dbm_kwargs(**x.dict()) for x in invites]
 
 
-@api_v1_router.get("/me.accept_invite", tags=["Me"], deprecated=True)
-async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
-    ...
+@api_v1_router.get("/me.accept_invite", tags=["Me"], response_model=OperationStatusOut)
+async def accept_team_invite(
+        curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
+        from_team_int_id: int = Query(...),
+):
+    team = await get_team(id_=from_team_int_id)
+    if team is None:
+        raise HTTPException(status_code=400, detail="team is None")
+    
+    await accept_invite(
+        from_team_oid=team.oid,
+        to_user_oid=curr_user.oid
+    )
+
+    return OperationStatusOut(is_done=True)
 
 
 """USER"""

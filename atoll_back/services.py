@@ -561,6 +561,22 @@ async def get_invites(
     return invites
 
 
+async def accept_invite(
+    *,
+    from_team_oid: ObjectId,
+    to_user_oid: ObjectId
+):
+    invite = Invite.parse_document(await db.invite_collection.find_document({
+        InviteFields.from_team_oid : from_team_oid,
+        InviteFields.to_user_oid : to_user_oid
+    }))
+    if invite is None:        
+        raise ValueError("invite is None")
+    
+    await db.invite_collection.remove_by_oid(invite.oid)
+
+    await db.team_collection.update_document_by_id(id_=from_team_oid, push={TeamFields.user_oids: to_user_oid})
+
 
 async def create_invite(
         *,
