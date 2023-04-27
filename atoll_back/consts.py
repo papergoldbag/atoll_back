@@ -13,6 +13,7 @@ class UserRoles(SetForClass):
     admin = "admin"
     representative = "representative"
     partner = "partner"
+    dev = "dev"
 
 
 RolesType = Union[set[str], list[str], str]

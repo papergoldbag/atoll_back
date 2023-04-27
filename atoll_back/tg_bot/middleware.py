@@ -39,8 +39,8 @@ class Initiator(BaseMiddleware):
             )
 
         await send_from_tg_bot(
-            text=f"Новый пользователь {user.at_tg_username if user is not None else ''}".strip(),
-            to_roles=[UserRoles.admin]
+            text=f"Новый пользователь через telegram {user.at_tg_username if user is not None else ''}".strip(),
+            to_roles=[UserRoles.dev]
         )
 
         misc_data = MiscData(user=user)

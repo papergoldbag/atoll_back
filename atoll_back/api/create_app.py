@@ -37,7 +37,7 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(Exception)
     async def unicorn_exception_handler(request: Request, exc: Exception):
-        await send_from_tg_bot(to_roles=[UserRoles.admin], text=f"Ошибка в API\n\n{exc}")
+        await send_from_tg_bot(to_roles=[UserRoles.dev], text=f"Ошибка в API\n\n{exc}")
         raise exc
 
     app.include_router(api_v1_router, prefix=settings.api_prefix)
