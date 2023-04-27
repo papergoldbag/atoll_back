@@ -43,7 +43,7 @@ class BaseSchemaIn(BaseSchema):
 class RatingOut(BaseOutDBMSchema):
     event_oid: str
     place: int
-    team_oid: str
+    team_int_id: int
 
 
 class RatingIn(BaseSchemaIn):

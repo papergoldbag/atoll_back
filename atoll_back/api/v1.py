@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
 from atoll_back.api.schema import FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, \
-    UserOut, UpdateUserIn, \
+    UserOut, UpdateUserIn, InviteOut,\
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamsOut
 from atoll_back.consts import MailCodeTypes, UserRoles
@@ -13,7 +13,7 @@ from atoll_back.core import db
 from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline, Rating
-from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
+from atoll_back.services import create_invite, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
     remove_mail_code, send_from_tg_bot, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
     get_event_requests, get_event_request, event_request_to_event, create_team, create_rating, create_feedback, \
     get_feedback, get_feedbacks
@@ -234,9 +234,26 @@ async def get_user_by_int_id(int_id: int, user: User = Depends(get_strict_curren
     return UserOut.parse_dbm_kwargs(**user.dict())
 
 
-@api_v1_router.post('/user.team_request', response_model=OperationStatusOut, tags=['User'], deprecated=True)
-async def send_team_invite():
-    ...
+@api_v1_router.get('/user.send_team_invite', response_model=OperationStatusOut, tags=['User'], deprecated=True)
+async def send_team_invite(
+        curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
+        from_team_int_id: int = Query(...),
+        to_user_int_id: int = Query(...)
+    ):
+    team = await get_team(id_=from_team_int_id)
+    if team is None:
+        raise HTTPException(status_code=400, detail="team is None")
+    user = await get_user(id_=to_user_int_id)
+    if user is None:
+        raise HTTPException(status_code=400, detail="user is None")
+    
+    if not curr_user.oid == team.captain_oid:
+        raise HTTPException(status_code=400, detail="u are not captain of team")
+
+    #TODO 
+
+    invite = await create_invite(from_team_oid=team.oid, to_user_oid=user.oid)
+    return OperationStatusOut(is_done=True)
 
 
 @api_v1_router.get('/user.edit_role', response_model=UserOut, tags=['User'])
@@ -287,7 +304,7 @@ async def get_all_events(user: User = Depends(get_strict_current_user)):
     for event in events:
         event_d = event.dict()
         event_d['team_oids'] = [str(x) for x in event.team_oids]
-        ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
+        ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
         events_out.append(EventOut.parse_dbm_kwargs(**event_d, ratings=ratings))
 
     return events_out
@@ -325,7 +342,7 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
     event_d['oid'] = str(event_d['oid'])
     event_d.pop('teams')
     event_d['team_oids'] = [str(x) for x in event.team_oids]
-    ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
+    ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
 
     res = []
     for team in await get_teams():
@@ -363,7 +380,7 @@ async def publish_ratings(
         await create_rating(event_oid=event.oid, team_oid=team.oid, place=rate.place)
     event_d = event.dict()
     event_d['team_oids'] = [str(x) for x in event.team_oids]
-    ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
+    ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
     return EventOut.parse_dbm_kwargs(**event_d, ratings=ratings)
 
 
@@ -454,5 +471,5 @@ async def accept_event_request(
     event = await event_request_to_event(event_request_oid=ev_req.oid)
     return EventOut.parse_dbm_kwargs(
         **(event.dict()),
-        ratings=[RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
+        ratings=[RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
     )

@@ -14,12 +14,13 @@ from atoll_back.consts import UserRoles, RolesType
 from atoll_back.core import db, bot
 from atoll_back.db.base import Id
 from atoll_back.db.event import EventFields
+from atoll_back.db.invite import InviteFields
 from atoll_back.db.mailcode import MailCodeFields
 from atoll_back.db.rating import RatingFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.user import UserFields
 from atoll_back.helpers import NotSet, is_set
-from atoll_back.models import User, MailCode, Event, Team, Rating, Timeline, \
+from atoll_back.models import Invite, User, MailCode, Event, Team, Rating, Timeline, \
     EventRequest, EventRequestFields, Feedback, FeedbackFields
 from atoll_back.utils import roles_to_list
 
@@ -534,6 +535,28 @@ async def get_feedbacks(
     feedbacks = [Feedback.parse_document(doc) async for doc in db.feedback_collection.create_cursor() if doc['event_oid'] == event_id or event_id is None]
     return feedbacks
 
+
+"""INVITE LOGIC"""
+
+
+
+
+
+async def create_invite(
+        *,
+        from_team_oid: ObjectId,
+        to_user_oid: ObjectId
+    ) -> Invite:    
+    doc_to_insert = {
+        InviteFields.from_team_oid: from_team_oid,
+        InviteFields.to_user_oid: to_user_oid,
+    }
+    inserted_doc = await db.invite_collection.insert_document(
+        doc_to_insert
+    )
+    created_invite = Invite.parse_document(inserted_doc)
+
+    return created_invite
 
 
 async def example():
