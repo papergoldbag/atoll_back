@@ -85,7 +85,7 @@ async def create_user(
         roles: RolesType = None
 ):
     if roles is None:
-        roles = [UserRoles.default]
+        roles = [UserRoles.sportsman]
     else:
         roles = roles_to_list(roles)
 

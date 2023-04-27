@@ -21,10 +21,10 @@ async def prepare_db():
 async def on_startup(*args, **kwargs):
     await prepare_db()
     if settings.mode == Modes.prod:
-        await send_from_tg_bot(text="API включен", to_roles=[UserRoles.admin,])
+        await send_from_tg_bot(text="Сервис активен", to_roles=[UserRoles.admin,])
 
 
 async def on_shutdown(*args, **kwargs):
     if settings.mode == Modes.prod:
-        await send_from_tg_bot(text="API выключен", to_roles=[UserRoles.admin,])
+        await send_from_tg_bot(text="Сервис не активен", to_roles=[UserRoles.admin,])
 

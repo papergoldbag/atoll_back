@@ -9,8 +9,10 @@ class MailCodeTypes(SetForClass):
 
 
 class UserRoles(SetForClass):
-    default = "default"
+    sportsman = "sportsman"
     admin = "admin"
+    representative = "representative"
+    partner = "partner"
 
 
 RolesType = Union[set[str], list[str], str]
