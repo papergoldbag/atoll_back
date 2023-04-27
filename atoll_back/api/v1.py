@@ -516,6 +516,12 @@ async def accept_event_request(
     if ev_req is None:
         raise HTTPException(status_code=400, detail=f"event request with int id {event_request_int_id} doesn't exists")
     event = await event_request_to_event(event_request_oid=ev_req.oid)
+    await send_from_tg_bot(text=f"Появилось новое мероприятие {event.title}.")
+    for userm in await get_users():
+        try:
+            send_mail(userm.mail, subject="Новое мероприятие", text=f"Появилось новое мероприятие {event.title}.")
+        except:
+            ...
     return EventOut.parse_dbm_kwargs(
         **(event.dict()),
         ratings=[RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
