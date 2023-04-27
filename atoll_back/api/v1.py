@@ -153,7 +153,7 @@ async def get_me(user: User = Depends(get_strict_current_user)):
 
 
 @api_v1_router.get("/me.my_requests", response_model=list[EventRequestOut], tags=["Me"])
-async def get_me(user: User = Depends(
+async def get_my_requests(user: User = Depends(
             make_strict_depends_on_roles([UserRoles.representative, UserRoles.partner])
         )
 ):
