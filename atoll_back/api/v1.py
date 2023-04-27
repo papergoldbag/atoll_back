@@ -138,6 +138,11 @@ async def get_me(user: User = Depends(get_strict_current_user)):
     )
 
 
+@api_v1_router.get("/me.team_requests", tags=["Me"])
+async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
+    ...
+
+
 @api_v1_router.post('/me.update', response_model=SensitiveUserOut, tags=['Me'])
 async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_strict_current_user)):
     update_user_data = update_user_in.dict(exclude_unset=True)
@@ -149,6 +154,11 @@ async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_stric
         **user.dict(),
         current_token=user.misc_data["current_token"]
     )
+
+
+@api_v1_router.post('/me.accept_request', response_model=OperationStatusOut, tags=['Me'])
+async def me_update(user: User = Depends(get_strict_current_user)):
+    ...
 
 
 """USER"""
@@ -184,4 +194,90 @@ async def get_all_users(user: User = Depends(get_strict_current_user)):
 @api_v1_router.get('/user.by_id', response_model=UserOut, tags=['User'])
 async def get_user_by_int_id(int_id: int, user: User = Depends(get_strict_current_user)):
     return UserOut.parse_dbm_kwargs(**(await get_user(id_=int_id)).dict())
+
+
+@api_v1_router.post('/user.team_request', response_model=OperationStatusOut, tags=['User'])
+async def send_team_invite():
+    ...
+
+
+@api_v1_router.post('/user.edit_role', response_model=OperationStatusOut, tags=['User'])
+async def edit_user_role():
+    ...
+
+
+"""TEAM"""
+
+
+@api_v1_router.get('/team.find', tags=['Team'])
+async def find_team():
+    ...
+
+
+@api_v1_router.get('/team.by_id', tags=['Team'])
+async def get_team_by_id():
+    ...
+    
+
+@api_v1_router.post('/team.update', tags=['Team'])
+async def update_team():
+    ...
+
+
+"""Event"""
+
+
+@api_v1_router.get('/event.all', tags=['Event'])
+async def get_all_events():
+    ...
+
+
+@api_v1_router.post('/event.update', tags=['Event'])
+async def update_event():
+    ...
+    
+
+@api_v1_router.post('/event.request', tags=['Event'])
+async def add_event_request():
+    ...
+    
+
+@api_v1_router.get('/event.teams', tags=['Event'])
+async def get_event_teams():
+    ...
+    
+
+@api_v1_router.get('/event.ratings', tags=['Event'])
+async def get_event_ratings():
+    ...
+
+
+@api_v1_router.post('/event.publish_ratings', tags=['Event'])
+async def publish_ratings():
+    ...
+    
+
+@api_v1_router.get('/event.join', tags=['Event'])
+async def join_event():
+    ...
+    
+
+@api_v1_router.post('/event.feedback', tags=['Event'])
+async def send_feedback():
+    ...
+    
+
+@api_v1_router.get('/event.feedbacks', tags=['Event'])
+async def get_event_feedbacks():
+    ...    
+
+
+@api_v1_router.get('/event.requests', tags=['Event'])
+async def get_event_requests():
+    ...
+    
+
+@api_v1_router.get('/event.accept_request', tags=['Event'])
+async def accept_event_request():
+    ...
 
