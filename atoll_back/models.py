@@ -13,6 +13,9 @@ from atoll_back.db.base import BaseFields, Document
 from atoll_back.db.event import EventFields
 from atoll_back.db.mailcode import MailCodeFields
 from atoll_back.db.team import TeamFields
+from atoll_back.db.event_request import EventRequestFields
+from atoll_back.db.invite import InviteFields
+from atoll_back.db.feedback import FeedbackFields
 from atoll_back.db.user import UserFields
 from atoll_back.utils import roles_to_list
 
@@ -147,7 +150,7 @@ class Event(BaseDBM):
     # db fields
     title: str = Field(alias=EventFields.title)
     description: str = Field(alias=EventFields.title)
-    team_ods: Optional[list[ObjectId]] = Field(alias=EventFields.team_oids)
+    team_oids: Optional[list[ObjectId]] = Field(alias=EventFields.team_oids)
     author_oid: ObjectId = Field(alias=EventFields.author_oid)
     start_dt: datetime = Field(alias=EventFields.start_dt)
     end_dt: datetime = Field(alias=EventFields.end_dt)
@@ -156,3 +159,18 @@ class Event(BaseDBM):
 
     # direct linked models
     users: list[User] = Field(default=[])
+
+
+class EventRequest(BaseDBM):
+    # db fields
+    title: str = Field(alias=EventRequestFields.title)
+    description: str = Field(alias=EventRequestFields.description)
+    requestor_oid: ObjectId = Field(alias=EventRequestFields.requestor_oid)
+    start_dt: datetime = Field(alias=EventRequestFields.start_dt)
+    end_dt: datetime = Field(alias=EventRequestFields.end_dt)
+    timeline: list[Timeline] = Field(alias=EventRequestFields.timeline)
+
+
+class Feedback(BaseDBM):
+    #db fields
+    ...
