@@ -42,7 +42,7 @@ async def send_reg_code(to_mail: str = Query(...)):
     return OperationStatusOut(is_done=True)
 
 
-@api_v1_router.get("/reg", response_model=SensitiveUserOut, tags=["Reg"])
+@api_v1_router.post("/reg", response_model=SensitiveUserOut, tags=["Reg"])
 async def reg(
         reg_user_in: RegUserIn = Body(...)
 ):
@@ -93,7 +93,7 @@ async def send_auth_code(to_mail: str = Query(...)):
     return OperationStatusOut(is_done=True)
 
 
-@api_v1_router.get("/auth", response_model=SensitiveUserOut, tags=["Auth"])
+@api_v1_router.post("/auth", response_model=SensitiveUserOut, tags=["Auth"])
 async def auth(
     auth_user_in: AuthUserIn = Body()
 ):
