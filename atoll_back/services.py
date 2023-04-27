@@ -316,6 +316,11 @@ async def get_team(*, id_: Id) -> Optional[Team]:
     return Team.parse_document(doc)
 
 
+async def get_team(*, id_: Id) -> list[Team]:
+    team_docs = await db.team_collection.find_documents()
+    return [Team.parse_document(team_doc) for team_doc in team_docs]
+
+
 """RATINGS LOGIC"""
 
 
