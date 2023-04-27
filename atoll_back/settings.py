@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     mongo_host: str
     mongo_port: int = 27017
     mongo_auth_db: Optional[str] = None
-    mongo_db_name: str = "voronezh"
+    mongo_db_name: str = "atoll"
 
     mailru_login: str
     mailru_password: str

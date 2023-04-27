@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name api.voronezh.divarteam.ru;
+    server_name api.atoll.divarteam.ru;
 
     location / {
         proxy_set_header Host $host;
@@ -13,7 +13,7 @@ server {
 
 server {
     listen 80;
-    server_name voronezh.divarteam.ru;
+    server_name atoll.atoll.ru;
 
     location / {
         proxy_set_header Host $host;
