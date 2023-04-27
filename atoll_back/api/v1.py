@@ -11,7 +11,7 @@ from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
-    remove_mail_code, update_user, get_events, get_ratings
+    remove_mail_code, update_user, get_events, get_ratings, get_teams
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -211,6 +211,12 @@ async def edit_user_role():
 
 
 """TEAM"""
+
+
+@api_v1_router.get('/teams.get', tags=['Team'])
+async def get_all_teams():
+    return await get_teams()
+
 
 
 @api_v1_router.get('/team.find', tags=['Team'], deprecated=True)
