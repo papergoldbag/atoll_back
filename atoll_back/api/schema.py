@@ -74,6 +74,9 @@ class InviteOut(BaseOutDBMSchema):
     from_team_oid: str
     to_user_oid: str
 
+    from_team: TeamOut
+    to_user: UserOut
+
 
 class EventRequestOut(BaseOutDBMSchema):
     title: str
