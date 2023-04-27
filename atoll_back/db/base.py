@@ -244,6 +244,13 @@ class BaseCollection:
         document = await self.motor_collection.find_one(filter_)
         return document
 
+    async def find_documents(
+            self, filter_: Optional[Filter] = None
+    ) -> list[Document]:
+        filter_ = self.__normalize_filter(filter_)
+        cursor = self.motor_collection.find(filter_)
+        return [doc for doc in cursor]
+
     async def find_document_by_id(
             self, id_: Id
     ) -> Optional[Document]:
