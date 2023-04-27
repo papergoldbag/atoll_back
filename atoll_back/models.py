@@ -152,7 +152,6 @@ class Event(BaseDBM):
     title: str = Field(alias=EventFields.title)
     description: str = Field(alias=EventFields.title)
     team_oids: Optional[list[ObjectId]] = Field(alias=EventFields.team_oids)
-    author_oid: ObjectId = Field(alias=EventFields.author_oid)
     start_dt: datetime = Field(alias=EventFields.start_dt)
     end_dt: datetime = Field(alias=EventFields.end_dt)
     timeline: list[Timeline] = Field(alias=EventFields.timeline)

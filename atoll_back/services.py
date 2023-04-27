@@ -371,7 +371,6 @@ async def create_event_request(
         *,
         title: str,
         description: str,
-        team_oids: list[ObjectId] = None,
         requestor_oid: ObjectId,
         start_dt: datetime = None,
         end_dt: datetime,
@@ -382,9 +381,6 @@ async def create_event_request(
 
     if timeline is None:
         timeline = []
-
-    if team_oids is None:
-        team_oids = []
 
     requestor = await get_user(id_=requestor_oid)
     if requestor is None:
@@ -406,8 +402,27 @@ async def create_event_request(
     return created_event_request
 
 
-async def event_request_to_event(*, event_request) -> Event:
-    pass
+async def get_event_request(*, id_: Id) -> Optional[EventRequest]:
+    doc = await db.event_request_collection.find_document_by_id(id_=id_)
+    if doc is None:
+        return None
+    return EventRequest.parse_document(doc)
+
+
+async def event_request_to_event(*, event_request_oid: ObjectId) -> Event:
+    event_request = await get_event_request(id_=event_request_oid)
+    # TODO
+    if event_request is None:
+        raise ValueError("event_request is None")
+
+    await create_event(
+        title=event_request.title,
+        description=event_request.title,
+        team_oids=event_request.title,
+        start_dt=event_request.start_dt,
+        end_dt=event_request.end_dt,
+        timeline=event_request.timeline
+    )
 
 
 """EVENT LOGIC"""
@@ -430,7 +445,6 @@ async def create_event(
         title: str,
         description: str,
         team_oids: list[ObjectId] = None,
-        author_oid: ObjectId,
         start_dt: datetime = None,
         end_dt: datetime,
         timeline: list[Timeline] = None
@@ -444,18 +458,10 @@ async def create_event(
     if team_oids is None:
         team_oids = []
 
-    author = await get_user(id_=author_oid)
-    if author is None:
-        raise ValueError("author is None")
-
-    if author.compare_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner]):
-        raise ValueError("bad roles")
-
     doc_to_insert = {
         EventFields.title: title,
         EventFields.description: description,
         EventFields.team_oids: team_oids,
-        EventFields.author_oid: author_oid,
         EventFields.start_dt: start_dt,
         EventFields.end_dt: end_dt,
         EventFields.timeline: [t.dict() for t in timeline]
