@@ -309,4 +309,5 @@ async def add_event_requests(
 
 @api_v1_router.get('/event.accept_request_to_create', tags=['Event'], deprecated=True)
 async def accept_event_request():
+    # TODO
     ...
