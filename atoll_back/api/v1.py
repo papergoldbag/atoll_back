@@ -152,7 +152,7 @@ async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_stric
     )
 
 
-@api_v1_router.get("/me.accepts", tags=["Me"], deprecated=True)
+@api_v1_router.get("/me.invite", tags=["Me"], deprecated=True)
 async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
     ...
 
@@ -162,7 +162,7 @@ async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
     ...
 
 
-@api_v1_router.post('/me.create_accept', response_model=OperationStatusOut, tags=['Me'], deprecated=True)
+@api_v1_router.post('/me.create_invite', response_model=OperationStatusOut, tags=['Me'], deprecated=True)
 async def me_update(user: User = Depends(get_strict_current_user)):
     ...
 
@@ -218,83 +218,55 @@ async def edit_user_role():
 """TEAM"""
 
 
-@api_v1_router.get('/teams.get', tags=['Team'])
+@api_v1_router.get('/team.all', tags=['Team'])
 async def get_all_teams():
     return await get_teams()
 
 
-
-@api_v1_router.get('/team.find', tags=['Team'], deprecated=True)
-async def find_team():
-    ...
-
-
-@api_v1_router.get('/team.by_id', response_model=Optional[TeamOut],tags=['Team'])
-async def get_team_by_id(id: int = Query(...)):
-    team_dict = await get_team(id_=id)
-    if team_dict is None:
+@api_v1_router.get('/team.get_by_id', response_model=Optional[TeamOut], tags=['Team'])
+async def get_team_by_id(int_id: int = Query(...)):
+    team = await get_team(id_=int_id)
+    if team is None:
         return None
-    team_dict = team_dict.dict()
-    team_dict['users'] = [InTeamUser.parse_dbm_kwargs(**(await get_user(id_=x)).dict(), is_captain=True if x==team_dict['captain_oid'] else False) for x in team_dict['user_oids']]
+    team_dict = team.dict()
+    team_dict['users'] = [
+        InTeamUser.parse_dbm_kwargs(
+            **(await get_user(id_=x)).dict(), is_captain=True if x == team_dict['captain_oid'] else False)
+        for x in team_dict['user_oids']
+    ]
     team_dict.pop('user_oids')
-    team = TeamOut.parse_dbm_kwargs(**team_dict)
-    return team
-
-
-@api_v1_router.post('/team.update', tags=['Team'], deprecated=True)
-async def update_team():
-    ...
+    return TeamOut.parse_dbm_kwargs(**team_dict)
 
 
 """Event"""
 
 
 @api_v1_router.get('/event.all', response_model=list[EventOut], tags=['Event'])
-async def get_all_events():
+async def get_all_events(user: User = Depends(get_strict_current_user)):
     events = await get_events()
     return [EventOut.parse_dbm_kwargs(**event.dict(), ratings=await get_ratings(event_oid=event.oid)) for event in events]
 
 
-@api_v1_router.get('/event.by_id', response_model=Optional[EventOut], tags=['Event'])
-async def get_event_by_id(id: int = Query(...)):
-    event_d = await get_event(id_=id)
-    if event_d is None:
+@api_v1_router.get("/event.join", deprecated=True, tags=["Me"])
+async def me_join_event(user: User = Depends(get_strict_current_user)):
+    ...
+
+
+@api_v1_router.get('/event.get_by_id', response_model=Optional[EventOut], tags=['Event'])
+async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_strict_current_user)):
+    event = await get_event(id_=int_id)
+    if event is None:
         return None
-    event_d = event_d.dict()
-    return EventOut.parse_dbm_kwargs(**event_d, ratings=await get_ratings(event_oid=event_d['oid']))
+    event_dict = event.dict()
+    return EventOut.parse_dbm_kwargs(**event_dict, ratings=await get_ratings(event_oid=event_dict['oid']))
 
 
-@api_v1_router.post('/event.update', tags=['Event'], deprecated=True)
-async def update_event():
-    ...
-
-
-@api_v1_router.post('/event.request', tags=['Event'], deprecated=True)
-async def add_event_request():
-    ...
-
-
-@api_v1_router.get('/event.teams', tags=['Event'], deprecated=True)
-async def get_event_teams():
-    ...
-
-
-@api_v1_router.get('/event.ratings', tags=['Event'], deprecated=True)
-async def get_event_ratings():
-    ...
-
-
-@api_v1_router.post('/event.publish_ratings', tags=['Event'], deprecated=True)
+@api_v1_router.post('/event.publish_ratings', tags=['Rating'], deprecated=True)
 async def publish_ratings():
     ...
 
 
-@api_v1_router.get('/event.join', tags=['Event'], deprecated=True)
-async def join_event():
-    ...
-
-
-@api_v1_router.post('/event.feedback', tags=['Event'], deprecated=True)
+@api_v1_router.post('/event.send_feedback', tags=['Event'], deprecated=True)
 async def send_feedback():
     ...
 
@@ -304,11 +276,11 @@ async def get_event_feedbacks():
     ...
 
 
-@api_v1_router.get('/event.requests', tags=['Event'], deprecated=True)
+@api_v1_router.get('/event.requests_to_create', tags=['Event'], deprecated=True)
 async def get_event_requests():
     ...
 
 
-@api_v1_router.get('/event.accept_request', tags=['Event'], deprecated=True)
+@api_v1_router.get('/event.accept_request_to_create', tags=['Event'], deprecated=True)
 async def accept_event_request():
     ...
