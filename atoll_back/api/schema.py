@@ -125,6 +125,12 @@ class TeamOut(BaseOutDBMSchema):
     users: list[InTeamUser]
 
 
+class TeamUpdate(BaseSchemaIn):
+    team_int_id: int
+    title: str
+    description: str
+
+
 class SensitiveUserOut(UserOut):
     tokens: list[str]
     current_token: str
