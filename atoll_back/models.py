@@ -155,7 +155,6 @@ class Event(BaseDBM):
     author_oid: ObjectId = Field(alias=EventFields.author_oid)
     start_dt: datetime = Field(alias=EventFields.start_dt)
     end_dt: datetime = Field(alias=EventFields.end_dt)
-    ratings: list[Rating] = Field(alias=EventFields.ratings)
     timeline: list[Timeline] = Field(alias=EventFields.timeline)
 
     # direct linked models
