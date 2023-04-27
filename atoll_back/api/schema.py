@@ -183,6 +183,15 @@ class AuthUserIn(BaseSchemaIn):
     mail: str
     code: str
 
+
+class RepresentativeRequestOut(BaseOutDBMSchema):
+    user_oid: str
+    user_int_id: int
+
+    user: UserOut
+
+
+RepresentativeRequestOut.update_forward_refs()
 EventWithTeamsOut.update_forward_refs()
 InviteOut.update_forward_refs()
 FeedbackWithBody.update_forward_refs()

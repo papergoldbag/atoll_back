@@ -11,6 +11,7 @@ from atoll_back.db.feedback import FeedbackCollection
 from atoll_back.db.invite import InviteCollection
 from atoll_back.db.mailcode import MailCodeCollection
 from atoll_back.db.rating import RatingCollection
+from atoll_back.db.representative_request import RepresentativeRequestCollection, RepresentativeRequestFields
 from atoll_back.db.team import TeamCollection
 from atoll_back.db.user import UserCollection
 
@@ -81,6 +82,12 @@ class DB:
             pymongo_db=self.pymongo_db
         )
         self.collections.append(self.rating)
+
+        self.representative_requests_collection: RepresentativeRequestCollection = RepresentativeRequestCollection.from_mongo_db(
+            motor_db=self.motor_db,
+            pymongo_db=self.pymongo_db
+        )
+        self.collections.append(self.representative_requests_collection)
 
     async def ensure_all_indexes(self):
         self.log.info('ensuring all indexes')
