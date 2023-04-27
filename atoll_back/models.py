@@ -185,6 +185,7 @@ class Feedback(BaseDBM):
     event_oid: ObjectId = Field(alias=FeedbackFields.event_oid)
     user_oid: ObjectId = Field(alias=FeedbackFields.user_oid)
     text: str = Field(alias=FeedbackFields.text)
+    rate: int = Field(alias=FeedbackFields.rate)
 
     # direct linked models
     user: Optional[User] = Field(default=None)

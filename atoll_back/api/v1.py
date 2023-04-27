@@ -374,13 +374,15 @@ async def get_analytics(event_int_id: int = Query(...), user: User = Depends(mak
         raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
     event_teams = [len((await get_team(id_=x)).user_oids) for x in event.team_oids]
 
-    feedbacks = await get_feedbacks(event_id=event.oid)
+    feedbacks = [x.rate for x in await get_feedbacks(event_id=event.oid)]
 
     a_d = dict(
         teams_count = len(event_teams),
-        mean_teams_participants = mean(event_teams),
-        participants_count = median(event_teams),
-        feedbacks_count = len(feedbacks)
+        mean_teams_participants = int(mean(event_teams)),
+        participants_count = int(median(event_teams)),
+        feedbacks_count = len(feedbacks),
+        mean_rate = int(mean(feedbacks)),
+        median_rate = int(median(feedbacks))
     )
 
     return EventAnalyticsOut.parse_obj(a_d)
@@ -488,10 +490,11 @@ async def send_feedback(
     feedback = await create_feedback(
         event_oid=event.oid,
         user_oid=user.oid,
-        text=feedback_in.text
+        text=feedback_in.text,
+        rate=feedback_in.rate
     )
     await send_from_tg_bot(
-        text=f"Обратная связь к событию:{event.title}\nОт {user.fullname} \n{feedback.text}",
+        text=f"Обратная связь к событию:{event.title}\nОт {user.fullname} \n{feedback.text} \n Оценка {feedback.rate}",
         to_roles=[UserRoles.admin, UserRoles.representative, UserRoles.partner]        
         )
     return FeedbackOut.parse_dbm_kwargs(**feedback.dict())
