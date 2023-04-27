@@ -306,6 +306,7 @@ async def create_team(
     }
     inserted_doc = await db.team_collection.insert_document(doc_to_insert)
     created_team = Team.parse_document(inserted_doc)
+
     return created_team
 
 
@@ -317,7 +318,7 @@ async def get_team(*, id_: Id) -> Optional[Team]:
 
 
 async def get_teams() -> list[Team]:
-    team_docs = await db.team_collection.find_documents()
+    team_docs = await db.team_collection.get_documents()
     return [Team.parse_document(team_doc) for team_doc in team_docs]
 
 

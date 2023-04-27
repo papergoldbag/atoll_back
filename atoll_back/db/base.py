@@ -267,7 +267,7 @@ class BaseCollection:
     ) -> Optional[Document]:
         return await self.find_document({BaseFields.int_id: int_id})
 
-    async def find_documents(self, cursor: AsyncIOMotorCursor) -> list[Document]:
+    async def get_documents(self, cursor: AsyncIOMotorCursor) -> list[Document]:
         return [doc async for doc in cursor]
 
     async def get_all_docs(self) -> list[Document]:

@@ -16,8 +16,9 @@ async def insert_test_data():
     setup_logging()
     await db.event_collection.remove_documents()
     await db.ensure_all_indexes()
-    # user = await create_user(fullname="abob1",mail="recrea.tor@yandex.ru")
-    user = (await get_users())[0]
+
+    user = await create_user(fullname="abob1", mail="recrea.tor@yandex.ru")
+
     team1 = Team.parse_document(
         await db.team_collection.insert_document(
             {
