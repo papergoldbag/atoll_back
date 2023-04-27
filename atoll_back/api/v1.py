@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, Query, status, Depends
+from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user
 from atoll_back.api.schema import OperationStatusOut, SensitiveUserOut, UserOut, UpdateUserIn, ExistsStatusOut, \
-    UserExistsStatusOut
+    UserExistsStatusOut, RegUserIn, AuthUserIn
 from atoll_back.consts import MailCodeTypes
 from atoll_back.core import db
 from atoll_back.db.user import UserFields
@@ -44,10 +44,9 @@ async def send_reg_code(to_mail: str = Query(...)):
 
 @api_v1_router.get("/reg", response_model=SensitiveUserOut, tags=["Reg"])
 async def reg(
-        mail: str = Query(...),
-        code: str = Query(...)
+        reg_user_in: RegUserIn = Body(...)
 ):
-    mail_codes = await get_mail_codes(to_mail=mail, code=code)
+    mail_codes = await get_mail_codes(to_mail=reg_user_in.mail, code=reg_user_in.code)
     if not mail_codes:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="not mail_codes")
     if len(mail_codes) != 1:
@@ -61,7 +60,7 @@ async def reg(
         if user is not None:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="user is not None")
 
-    user = await create_user(mail=mail, auto_create_at_least_one_token=True)
+    user = await create_user(mail=reg_user_in.mail, auto_create_at_least_one_token=True)
 
     # TODO: tg notify
 
@@ -96,10 +95,9 @@ async def send_auth_code(to_mail: str = Query(...)):
 
 @api_v1_router.get("/auth", response_model=SensitiveUserOut, tags=["Auth"])
 async def auth(
-        mail: str = Query(...),
-        code: str = Query(...)
+    auth_user_in: AuthUserIn = Body()
 ):
-    mail_codes = await get_mail_codes(to_mail=mail, code=code)
+    mail_codes = await get_mail_codes(to_mail=auth_user_in.mail, code=auth_user_in.code)
     if not mail_codes:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="not mail_codes")
     if len(mail_codes) != 1:

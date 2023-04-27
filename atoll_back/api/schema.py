@@ -68,3 +68,14 @@ class UpdateUserIn(BaseSchemaIn):
 
 class UserExistsStatusOut(BaseSchemaOut):
     is_exists: bool
+
+
+class RegUserIn(BaseSchemaIn):
+    mail: str
+    code: str
+
+
+class AuthUserIn(BaseSchemaIn):
+    mail: str
+    code: str
+
