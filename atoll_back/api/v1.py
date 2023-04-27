@@ -494,8 +494,14 @@ async def send_feedback(
         text=feedback_in.text,
         rate=feedback_in.rate
     )
+    text_tg=(
+        "<b>Обратная связь</b>\n"
+        f"Отправитель: {user.fullname}\n"
+        f"Сообщение: {feedback.text}\n"
+        f"Оценка: {feedback.rate}"
+    )
     await send_from_tg_bot(
-        text=f"Обратная связь к событию:{event.title}\nОт {user.fullname} \n{feedback.text} \n Оценка {feedback.rate}",
+        text=text_tg,
         to_roles=[UserRoles.admin, UserRoles.representative, UserRoles.partner]        
         )
     return FeedbackOut.parse_dbm_kwargs(**feedback.dict())
@@ -559,6 +565,8 @@ async def add_event_requests(
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner]))
 ):
+    if event_data.end_dt < event_data.start_dt:
+        raise HTTPException(status_code=400, detail="end_dt must be greater than start_dt") 
     req = await create_event_request(
         title=event_data.title,
         description=event_data.description,
