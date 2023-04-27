@@ -414,6 +414,11 @@ async def get_event_request(*, id_: Id) -> Optional[EventRequest]:
     return EventRequest.parse_document(doc)
 
 
+async def get_event_requests() -> list[EventRequest]:
+    events_req = [EventRequest.parse_document(doc) async for doc in db.event_request_collection.create_cursor()]
+    return events_req
+
+
 async def event_request_to_event(*, event_request_oid: ObjectId) -> Event:
     event_request = await get_event_request(id_=event_request_oid)
     if event_request is None:
