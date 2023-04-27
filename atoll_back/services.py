@@ -539,8 +539,16 @@ async def get_feedbacks(
 """INVITE LOGIC"""
 
 
-
-
+async def get_invite(
+    *,
+    from_team_oid: ObjectId,
+    to_user_oid: ObjectId
+) -> Optional[Invite]:
+    invite = db.invite_collection.find_document({
+        'from_team_oid':from_team_oid,
+        'to_user_oid':to_user_oid
+    })
+    return invite
 
 async def create_invite(
         *,
