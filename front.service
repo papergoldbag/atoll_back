@@ -1,0 +1,13 @@
+[Unit]
+Description=api
+After=network.target
+
+[Service]
+User=atoll_front
+WorkingDirectory=/home/atoll_front/atoll_front
+ExecStart=/home/atoll_front/run.sh
+RestartSec=5
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
