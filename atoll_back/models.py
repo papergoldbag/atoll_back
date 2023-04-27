@@ -13,6 +13,7 @@ from atoll_back.db.base import BaseFields, Document
 from atoll_back.db.event import EventFields
 from atoll_back.db.mailcode import MailCodeFields
 from atoll_back.db.rating import RatingFields
+from atoll_back.db.representative_request import RepresentativeRequestFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.event_request import EventRequestFields
 from atoll_back.db.invite import InviteFields
@@ -200,3 +201,12 @@ class Invite(BaseDBM):
     # direct linked models
     user: Optional[User] = Field(default=None)
     team: Optional[Team] = Field(default=None)
+
+
+class RepresentativeRequest(BaseDBM):
+    #db fields
+    user_oid: ObjectId = Field(alias=RepresentativeRequestFields.user_oid)
+    user_int_id: int = Field(alias=RepresentativeRequestFields.user_int_id)
+
+    #direct linked models
+    user: Optional[User] = Field(default=None)

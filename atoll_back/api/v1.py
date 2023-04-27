@@ -6,7 +6,7 @@ from statistics import median, mean
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, FeedbackWithBody, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, TeamUpdate, \
+from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, FeedbackWithBody, InTeamUser, OperationStatusOut, RepresentativeRequestIn, RepresentativeRequestOut, SensitiveUserOut, TeamOut, TeamUpdate, \
     UserOut, UpdateUserIn, InviteOut,\
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamsOut
@@ -16,7 +16,7 @@ from atoll_back.db.event import EventFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline, Rating
-from atoll_back.services import accept_invite, create_invite, get_invite, get_invites, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
+from atoll_back.services import accept_invite, create_invite, create_representative_request, get_invite, get_invites, get_representative_requests, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
     remove_mail_code, send_from_tg_bot, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
     get_event_requests, get_event_request, event_request_to_event, create_team, create_rating, create_feedback, \
     get_feedback, get_feedbacks
@@ -606,3 +606,29 @@ async def send_support_message(
         except:
             ...
     return OperationStatusOut(is_done=True)
+
+
+"""REPRESANTATIVE REQUESTS"""
+
+
+@api_v1_router.get('/representative_request.all', tags=['Representative request'], response_model=list[RepresentativeRequestOut])
+async def get_all_representative_request(
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.admin]))
+    ):
+    repr_req = [RepresentativeRequestOut.parse_dbm_kwargs(**x.dict()) for x in await get_representative_requests()]
+    return repr_req
+
+
+@api_v1_router.post('/representative_request.add', tags=['Representative request'], response_model=RepresentativeRequestOut)
+async def add_representative_request(
+    repr_req: RepresentativeRequestIn = Body(...),
+    user: User = Depends(
+        make_strict_depends_on_roles([UserRoles.sportsman]))):
+    repr_req_db = await create_representative_request(
+        user_oid=repr_req.user_oid,
+        user_int_id=repr_req.user_int_id
+    )
+    return RepresentativeRequestOut.parse_dbm_kwargs(**repr_req_db.dict())
+
+

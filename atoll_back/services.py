@@ -17,10 +17,11 @@ from atoll_back.db.event import EventFields
 from atoll_back.db.invite import InviteFields
 from atoll_back.db.mailcode import MailCodeFields
 from atoll_back.db.rating import RatingFields
+from atoll_back.db.representative_request import RepresentativeRequestFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.user import UserFields
 from atoll_back.helpers import NotSet, is_set
-from atoll_back.models import Invite, User, MailCode, Event, Team, Rating, Timeline, \
+from atoll_back.models import Invite, RepresentativeRequest, User, MailCode, Event, Team, Rating, Timeline, \
     EventRequest, EventRequestFields, Feedback, FeedbackFields
 from atoll_back.utils import roles_to_list
 
@@ -595,6 +596,31 @@ async def create_invite(
     created_invite = Invite.parse_document(inserted_doc)
 
     return created_invite
+
+
+"""REPRESENTATIVE REQUEST LOGIC"""
+
+
+async def get_representative_requests() -> list[RepresentativeRequest]:
+    representative_requests = [RepresentativeRequest.parse_document(x) async for x in db.representative_requests_collection.create_cursor()]
+    return representative_requests
+
+
+async def create_representative_request(
+    *,
+    user_oid: ObjectId,
+    user_int_id: int
+    ) -> RepresentativeRequest:
+    doc_to_insert = {
+        RepresentativeRequestFields.user_oid: user_oid,
+        RepresentativeRequestFields.user_int_id: user_int_id,
+    }
+    inserted_doc = await db.representative_requests_collection.insert_document(
+        doc_to_insert
+    )
+    created_repr_req = RepresentativeRequest.parse_document(inserted_doc)
+
+    return created_repr_req
 
 
 async def example():
