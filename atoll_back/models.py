@@ -121,7 +121,7 @@ class Team(BaseDBM):
     # db_fields
     title: str = Field(alias=TeamFields.title)
     description: str = Field(alias=TeamFields.description)
-    user_ids: str = Field(alias=TeamFields.user_oids)
+    user_oids: list[ObjectId] = Field(alias=TeamFields.user_oids)
 
     # direct linked models
     users: list[User] = Field(default=[])
