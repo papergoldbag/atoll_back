@@ -252,7 +252,7 @@ async def me_join_event(user: User = Depends(get_strict_current_user)):
     ...
 
 
-@api_v1_router.get('/event.get_by_id', response_model=Optional[EventOut], tags=['Event'])
+@api_v1_router.get('/event.get_by_int_id', response_model=Optional[EventOut], tags=['Event'])
 async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_strict_current_user)):
     event = await get_event(id_=int_id)
     if event is None:
