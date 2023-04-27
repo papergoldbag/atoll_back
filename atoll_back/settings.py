@@ -12,7 +12,7 @@ ENV_FILEPATH: str = os.path.join(BASE_DIRPATH, '.env')
 
 
 class Settings(BaseSettings):
-    api_title: str = "VORONEZH API"
+    api_title: str = "ATOLL API"
     api_prefix: str = "/api"
 
     mongo_user: Optional[str] = None
