@@ -36,6 +36,7 @@ async def update_user(
         birth_dt: Union[NotSet, Optional[datetime]] = NotSet,
         tg_id: Union[NotSet, Optional[int]] = NotSet,
         tg_username: Union[NotSet, Optional[str]] = NotSet,
+        vk_id: Union[NotSet, Optional[int]] = NotSet,
         description: Union[NotSet, Optional[str]] = NotSet
 ) -> User:
     if isinstance(user, User):
@@ -57,6 +58,8 @@ async def update_user(
         set_[UserFields.birth_dt] = birth_dt
     if is_set(tg_id):
         set_[UserFields.tg_id] = tg_id
+    if is_set(vk_id):
+        set_[UserFields.vk_id] = vk_id
     if is_set(tg_username):
         set_[UserFields.tg_username] = tg_username
     if is_set(description):
@@ -74,6 +77,8 @@ async def update_user(
             user.birth_dt = birth_dt
         if is_set(tg_id):
             user.tg_id = tg_id
+        if is_set(vk_id):
+            set_[UserFields.vk_id] = vk_id
         if is_set(tg_username):
             user.tg_username = tg_username
         if is_set(description):
