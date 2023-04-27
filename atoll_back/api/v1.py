@@ -12,7 +12,8 @@ from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
-    remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request
+    remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
+    get_event_requests, get_event_request
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -278,14 +279,15 @@ async def get_event_feedbacks():
     ...
 
 
-@api_v1_router.get('/event.get_all_requests_to_create_event', tags=['Event'], response_model=EventRequestOut)
-async def add_event_requests(
+@api_v1_router.get('/event.get_all_requests_to_create_event', tags=['Event'], response_model=list[EventRequestOut])
+async def get_all_event_requests(
         user: User = Depends(
-            make_strict_depends_on_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner])
+            make_strict_depends_on_roles([UserRoles.admin])
         )
 ):
-    pass
-    # TODO
+    ev_req = await get_event_requests()
+    return [EventRequestOut.parse_dbm_kwargs(**event.dict()) for event in
+            ev_req]
 
 
 @api_v1_router.post('/event.requests_to_create_event', tags=['Event'], response_model=EventRequestOut)
