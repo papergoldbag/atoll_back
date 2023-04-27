@@ -280,7 +280,7 @@ async def create_mail_code(
 
 
 async def get_events() -> list[Event]:
-    events = [Event.parse_document(doc) async for doc in db.user_collection.create_cursor()]
+    events = [Event.parse_document(doc) async for doc in db.event_collection.create_cursor()]
     return events
 
 
