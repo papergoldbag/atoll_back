@@ -6,7 +6,7 @@ from statistics import median, mean
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, TeamUpdate, \
+from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, FeedbackWithBody, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, TeamUpdate, \
     UserOut, UpdateUserIn, InviteOut,\
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamsOut
@@ -374,13 +374,15 @@ async def get_analytics(event_int_id: int = Query(...), user: User = Depends(mak
         raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
     event_teams = [len((await get_team(id_=x)).user_oids) for x in event.team_oids]
 
-    feedbacks = await get_feedbacks(event_id=event.oid)
+    feedbacks = [x.rate for x in await get_feedbacks(event_id=event.oid)]
 
     a_d = dict(
         teams_count = len(event_teams),
-        mean_teams_participants = mean(event_teams),
-        participants_count = median(event_teams),
-        feedbacks_count = len(feedbacks)
+        mean_teams_participants = int(mean(event_teams)),
+        participants_count = int(median(event_teams)),
+        feedbacks_count = len(feedbacks),
+        mean_rate = int(mean(feedbacks)),
+        median_rate = int(median(feedbacks))
     )
 
     return EventAnalyticsOut.parse_obj(a_d)
@@ -488,18 +490,21 @@ async def send_feedback(
     feedback = await create_feedback(
         event_oid=event.oid,
         user_oid=user.oid,
-        text=feedback_in.text
+        text=feedback_in.text,
+        rate=feedback_in.rate
     )
     await send_from_tg_bot(
-        text=f"Обратная связь к событию:{event.title}\nОт {user.fullname} \n{feedback.text}",
+        text=f"Обратная связь к событию:{event.title}\nОт {user.fullname} \n{feedback.text} \n Оценка {feedback.rate}",
         to_roles=[UserRoles.admin, UserRoles.representative, UserRoles.partner]        
         )
     return FeedbackOut.parse_dbm_kwargs(**feedback.dict())
 
 
-@api_v1_router.get('/event.feedbacks', tags=['Event'], response_model=list[FeedbackOut])
+@api_v1_router.get('/event.feedbacks', tags=['Event'], response_model=list[FeedbackWithBody])
 async def get_event_feedbacks(
-        event_int_id: Optional[int] = Query(None)
+        event_int_id: Optional[int] = Query(None),
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.admin, UserRoles.partner, UserRoles.representative]))
 ):
     e_oid = None
     if not event_int_id is None:
@@ -507,7 +512,21 @@ async def get_event_feedbacks(
         if event is None:
             raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
         e_oid = event.oid
-    feedbacks = [FeedbackOut.parse_dbm_kwargs(**x.dict()) for x in await get_feedbacks(event_id=e_oid)]
+    feedbacks = []
+    for feedback in await get_feedbacks(event_id=e_oid):
+        event = await get_event(id_=feedback.event_oid)
+        event_d = event.dict()
+        event_d['team_oids'] = [str(x) for x in event.team_oids]
+        ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
+        event_o = EventOut.parse_dbm_kwargs(**event_d, ratings=ratings)
+        user_o = UserOut.parse_dbm_kwargs(**(await get_user(id_=feedback.user_oid)).dict())
+        feedbacks.append(FeedbackWithBody.parse_dbm_kwargs(
+            **feedback.dict(exclude_unset=True),
+            event=event_o,
+            user=user_o
+        ))
+        
+
     return feedbacks
 
 

@@ -510,12 +510,14 @@ async def create_feedback(
         *,
         event_oid: ObjectId,
         user_oid: ObjectId,
-        text: str
+        text: str,
+        rate: int
     ) -> Feedback:
     doc_to_insert = {
         FeedbackFields.event_oid: event_oid,
         FeedbackFields.user_oid: user_oid,
         FeedbackFields.text: text,
+        FeedbackFields.rate: rate
     }
     inserted_doc = await db.feedback_collection.insert_document(
         doc_to_insert

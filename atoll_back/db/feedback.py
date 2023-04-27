@@ -5,6 +5,7 @@ class FeedbackFields(BaseFields):
     event_oid = "event_oid"
     user_oid = "user_oid"
     text = "text"
+    rate = "rate"
 
 
 class FeedbackCollection(BaseCollection):

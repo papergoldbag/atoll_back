@@ -91,6 +91,8 @@ class EventAnalyticsOut(BaseModel):
     mean_teams_participants: int
     participants_count: int
     feedbacks_count: int 
+    mean_rate: int
+    median_rate: int
 
 
 class EventRequestIn(BaseSchemaIn):
@@ -105,11 +107,18 @@ class FeedbackOut(BaseOutDBMSchema):
     event_oid: str
     user_oid: str
     text: str
+    rate: int
+
+
+class FeedbackWithBody(FeedbackOut):
+    event: EventOut
+    user: UserOut
 
 
 class FeedbackIn(BaseSchemaIn):
     event_int_id: int
     text: str
+    rate: int
 
 
 class UserOut(BaseOutDBMSchema):
@@ -176,3 +185,4 @@ class AuthUserIn(BaseSchemaIn):
 
 EventWithTeamsOut.update_forward_refs()
 InviteOut.update_forward_refs()
+FeedbackWithBody.update_forward_refs()
