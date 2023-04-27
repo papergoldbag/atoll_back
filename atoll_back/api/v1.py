@@ -176,7 +176,7 @@ async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_stric
         **update_user_data
     )
     return SensitiveUserOut.parse_dbm_kwargs(
-        **user.dict(),
+        **(await get_user(id_=user.oid)).dict(),
         current_token=user.misc_data["current_token"]
     )
 
