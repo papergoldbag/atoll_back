@@ -27,6 +27,14 @@ async def healthcheck():
     return {"working": True}
 
 
+"""ROLES"""
+
+
+@api_v1_router.get('/roles', tags=['Roles'])
+async def get_roles():
+    return UserRoles.set()
+
+
 """REGISTRATION"""
 
 
@@ -144,6 +152,22 @@ async def get_me(user: User = Depends(get_strict_current_user)):
     )
 
 
+@api_v1_router.get("/me.my_requests", response_model=list[EventRequestOut], tags=["Me"])
+async def get_me(user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.representative, UserRoles.partner])
+        )
+):
+    ev_req = await get_event_requests()
+    requestor = user
+    if requestor is None:
+        raise HTTPException(status_code=400, detail="requestor is None")
+    res = []
+    for event in ev_req:
+        if event.requestor_oid == requestor.oid:
+            res.append(EventRequestOut.parse_dbm_kwargs(**event.dict()))
+    return res
+
+
 @api_v1_router.post('/me.update', response_model=SensitiveUserOut, tags=['Me'])
 async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_strict_current_user)):
     update_user_data = update_user_in.dict(exclude_unset=True)
@@ -215,9 +239,19 @@ async def send_team_invite():
     ...
 
 
-@api_v1_router.post('/user.edit_role', response_model=OperationStatusOut, tags=['User'], deprecated=True)
-async def edit_user_role():
-    ...
+@api_v1_router.get('/user.edit_role', response_model=UserOut, tags=['User'])
+async def edit_user_role(        
+        curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.admin])),
+        user_int_id: int = Query(...),
+        role: str = Query(...)
+    ):
+    user = await get_user(id_=user_int_id)
+    if user is None:
+        raise HTTPException(status_code=400, detail="user is none")
+    if not role in UserRoles.set():
+        raise HTTPException(status_code=400, detail="invalid role")
+    await db.user_collection.update_document_by_id(id_=user.oid, set_={UserFields.roles:[role]})
+    return UserOut.parse_dbm_kwargs(**(await get_user(id_=user.oid)).dict())
 
 
 """TEAM"""
