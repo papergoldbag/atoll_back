@@ -109,6 +109,12 @@ class User(BaseDBM):
         needed_roles = roles_to_list(needed_roles)
         return bool(set(needed_roles) & set(self.roles))
 
+    @property
+    def at_tg_username(self) -> str:
+        if self.tg_username is not None:
+            return f"@{self.tg_username}"
+        return ""
+
 
 class MailCode(BaseDBM):
     # db fields
