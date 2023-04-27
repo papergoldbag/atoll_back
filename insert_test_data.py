@@ -52,7 +52,7 @@ async def insert_test_data():
         team_oids=[team1.oid, team2.oid, team3.oid],
         author_oid=user,
         end_dt=datetime.utcnow() + timedelta(days=30),
-        timelines=[Timeline(
+        timeline=[Timeline(
             dt=datetime.utcnow(),
             text='TEST TEXT'
         )]
@@ -79,7 +79,7 @@ async def insert_test_data():
         description="TEST22",
         author_oid=user,
         end_dt=datetime.utcnow() + timedelta(days=30),
-        timelines=[Timeline(
+        timeline=[Timeline(
             dt=datetime.utcnow(),
             text='TEST TEXT2'
         )]
@@ -90,7 +90,7 @@ async def insert_test_data():
         description="TEST33",
         author_oid=user,
         end_dt=datetime.utcnow() + timedelta(days=30),
-        timelines=[Timeline(
+        timeline=[Timeline(
             dt=datetime.utcnow(),
             text='TEST TEXT3'
         )]

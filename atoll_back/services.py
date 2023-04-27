@@ -406,6 +406,10 @@ async def create_event_request(
     return created_event_request
 
 
+async def event_request_to_event(*, event_request) -> Event:
+    pass
+
+
 """EVENT LOGIC"""
 
 
@@ -429,13 +433,13 @@ async def create_event(
         author_oid: ObjectId,
         start_dt: datetime = None,
         end_dt: datetime,
-        timelines: list[Timeline] = None
+        timeline: list[Timeline] = None
 ) -> Event:
     if start_dt is None:
         start_dt = datetime.utcnow()
 
-    if timelines is None:
-        timelines = []
+    if timeline is None:
+        timeline = []
 
     if team_oids is None:
         team_oids = []
@@ -444,6 +448,9 @@ async def create_event(
     if author is None:
         raise ValueError("author is None")
 
+    if author.compare_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner]):
+        raise ValueError("bad roles")
+
     doc_to_insert = {
         EventFields.title: title,
         EventFields.description: description,
@@ -451,7 +458,7 @@ async def create_event(
         EventFields.author_oid: author_oid,
         EventFields.start_dt: start_dt,
         EventFields.end_dt: end_dt,
-        EventFields.timeline: [t.dict() for t in timelines]
+        EventFields.timeline: [t.dict() for t in timeline]
     }
     inserted_doc = await db.event_collection.insert_document(
         doc_to_insert
