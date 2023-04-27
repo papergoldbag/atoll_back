@@ -4,7 +4,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, \
+from atoll_back.api.schema import FeedbackIn, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, \
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn
 from atoll_back.consts import MailCodeTypes, UserRoles
@@ -303,7 +303,8 @@ async def publish_ratings(
     if event is None:
         raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
     for rate in ratings:
-        await create_rating(event_oid=event.oid, team_oid=ObjectId(rate.team_oid), place=rate.place)
+        team = await get_team(id_=rate.team_int_id)
+        await create_rating(event_oid=event.oid, team_oid=team.oid, place=rate.place)
     event_d = event.dict()
     event_d['team_oids'] = [str(x) for x in event.team_oids]
     ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
@@ -312,7 +313,11 @@ async def publish_ratings(
 
 
 @api_v1_router.post('/event.send_feedback', tags=['Event'], deprecated=True)
-async def send_feedback():
+async def send_feedback(
+        feedback_in: FeedbackIn = Body(...),
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.sportsman]))
+    ):
     ...
 
 
