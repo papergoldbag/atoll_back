@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user
-from atoll_back.api.schema import OperationStatusOut, SensitiveUserOut, UserOut, UpdateUserIn, UserExistsStatusOut, \
+from atoll_back.api.schema import InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, UserOut, UpdateUserIn, UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut
 from atoll_back.consts import MailCodeTypes
 from atoll_back.core import db
@@ -11,7 +11,7 @@ from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
-    remove_mail_code, update_user, get_events, get_ratings, get_teams
+    remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -224,9 +224,13 @@ async def find_team():
     ...
 
 
-@api_v1_router.get('/team.by_id', tags=['Team'], deprecated=True)
-async def get_team_by_id():
-    ...
+@api_v1_router.get('/team.by_id', response_model=TeamOut,tags=['Team'])
+async def get_team_by_id(id: int = Query(...)):
+    team_dict = (await get_team(id_=id)).dict()
+    team_dict['users'] = [InTeamUser.parse_dbm_kwargs(**(await get_user(id_=x)).dict(), is_captain=True if x==team_dict['captain_oid'] else False) for x in team_dict['user_oids']]
+    team_dict.pop('user_oids')
+    team = TeamOut.parse_dbm_kwargs(**team_dict)
+    return team
 
 
 @api_v1_router.post('/team.update', tags=['Team'], deprecated=True)
