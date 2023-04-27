@@ -185,7 +185,28 @@ async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_stric
 @api_v1_router.get("/me.my_invites", tags=["Me"], response_model=list[InviteOut])
 async def get_my_invites(user: User = Depends(get_strict_current_user)):
     invites = await get_invites(to_user_oid=user.oid)
-    return [InviteOut.parse_dbm_kwargs(**x.dict()) for x in invites]
+
+    res = []
+    for invite in invites:
+        team = await get_team(id_=invite.from_team_oid)
+        team_users = [
+            user
+            for user in await get_users()
+            if user.oid in invite.team.user_oids
+        ]
+        to_user = await get_user(id_=invite.to_user_oid)
+
+        InviteOut(
+            from_team_oid=invite.from_team_oid,
+            to_user_oid=invite.to_user_oid,
+
+            from_team=TeamOut.parse_dbm_kwargs(**(team.dict())),
+            to_user=UserOut.parse_dbm_kwargs(**(to_user.dict()))
+        )
+
+        res.append(invite)
+
+    return res
 
 
 @api_v1_router.get("/me.accept_invite", tags=["Me"], response_model=OperationStatusOut)
