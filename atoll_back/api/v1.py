@@ -278,7 +278,17 @@ async def get_event_feedbacks():
     ...
 
 
-@api_v1_router.post('/event.requests_to_create', tags=['Event'], response_model=EventRequestOut)
+@api_v1_router.get('/event.get_all_requests_to_create_event', tags=['Event'], response_model=EventRequestOut)
+async def add_event_requests(
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner])
+        )
+):
+    pass
+    # TODO
+
+
+@api_v1_router.post('/event.requests_to_create_event', tags=['Event'], response_model=EventRequestOut)
 async def add_event_requests(
         event_data: EventRequestIn = Body(...),
         user: User = Depends(
