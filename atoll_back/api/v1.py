@@ -189,22 +189,22 @@ async def get_my_invites(user: User = Depends(get_strict_current_user)):
     res = []
     for invite in invites:
         team = await get_team(id_=invite.from_team_oid)
-        team_users = [
-            user
-            for user in await get_users()
-            if user.oid in invite.team.user_oids
+        team_dict = team.dict()
+        team_dict['users'] = [
+            InTeamUser.parse_dbm_kwargs(
+                **(await get_user(id_=x)).dict(), is_captain=True if x == team_dict['captain_oid'] else False)
+            for x in team_dict['user_oids']
         ]
+        team_dict.pop('user_oids')
         to_user = await get_user(id_=invite.to_user_oid)
-
-        InviteOut(
-            from_team_oid=invite.from_team_oid,
-            to_user_oid=invite.to_user_oid,
-
+        print(invite)
+        invo = InviteOut.parse_dbm_kwargs(
+            **invite.dict(),
             from_team=TeamOut.parse_dbm_kwargs(**(team.dict())),
             to_user=UserOut.parse_dbm_kwargs(**(to_user.dict()))
         )
 
-        res.append(invite)
+        res.append(invo)
 
     return res
 
