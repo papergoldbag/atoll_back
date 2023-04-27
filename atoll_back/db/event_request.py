@@ -3,7 +3,7 @@ import pymongo
 from atoll_back.db.base import BaseCollection, BaseFields
 
 
-class EventFields(BaseFields):
+class EventRequestFields(BaseFields):
     title = "title"
     description = "description"
     requestor_id = "requestor_id"
@@ -12,5 +12,5 @@ class EventFields(BaseFields):
     timeline = "timeline"
 
 
-class EventCollection(BaseCollection):
+class EventRequestCollection(BaseCollection):
     COLLECTION_NAME = "event"

@@ -7,6 +7,11 @@ from pymongo.errors import OperationFailure, ConnectionFailure
 
 from atoll_back.db.mailcode import MailCodeCollection
 from atoll_back.db.user import UserCollection
+from atoll_back.db.event_request import EventRequestCollection
+from atoll_back.db.event import EventCollection
+from atoll_back.db.feedback import FeedbackCollection
+from atoll_back.db.team import TeamCollection
+from atoll_back.db.invites import InviteCollection
 
 
 class CannotConnectToDb(Exception):
@@ -35,6 +40,36 @@ class DB:
         self.collections.append(self.user_collection)
 
         self.mail_code_collection: MailCodeCollection = MailCodeCollection.from_mongo_db(
+            motor_db=self.motor_db,
+            pymongo_db=self.pymongo_db
+        )
+        self.collections.append(self.mail_code_collection)
+
+        self.event_request_collection: EventRequestCollection = EventRequestCollection.from_mongo_db(
+            motor_db=self.motor_db,
+            pymongo_db=self.pymongo_db
+        )
+        self.collections.append(self.event_request_collection)
+
+        self.event_collection: EventCollection = EventCollection.from_mongo_db(
+            motor_db=self.motor_db,
+            pymongo_db=self.pymongo_db
+        )
+        self.collections.append(self.event_collection)
+
+        self.team_collection: TeamCollection = TeamCollection.from_mongo_db(
+            motor_db=self.motor_db,
+            pymongo_db=self.pymongo_db
+        )
+        self.collections.append(self.team_collection)
+
+        self.invite_collection: InviteCollection = InviteCollection.from_mongo_db(
+            motor_db=self.motor_db,
+            pymongo_db=self.pymongo_db
+        )
+        self.collections.append(self.invite_collection)
+
+        self.feedback_collection: FeedbackCollection = FeedbackCollection.from_mongo_db(
             motor_db=self.motor_db,
             pymongo_db=self.pymongo_db
         )
