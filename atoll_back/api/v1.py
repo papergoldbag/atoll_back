@@ -487,3 +487,20 @@ async def accept_event_request(
         **(event.dict()),
         ratings=[RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
     )
+
+
+"""SUPPORT"""
+
+@api_v1_router.get('/support', response_model=OperationStatusOut, tags=['Support'])
+async def send_support_message(    
+        text: str = Query(...),
+        user: User = Depends(get_strict_current_user)
+):
+    adms = await get_users(roles=[UserRoles.admin])
+    await send_from_tg_bot(text=f"Сообщение в поддержку: {text}",to_roles=[UserRoles.admin])
+    for adm in adms:
+        try:
+            await send_mail(to_email=adm.mail, subject="support", text=f"Сообщение в поддержку: {text}")
+        except:
+            ...
+    return OperationStatusOut(is_done=True)
