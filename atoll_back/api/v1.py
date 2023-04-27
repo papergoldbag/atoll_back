@@ -200,7 +200,6 @@ async def get_my_invites(user: User = Depends(get_strict_current_user)):
         ]
         team_dict.pop('user_oids')
         to_user = await get_user(id_=invite.to_user_oid)
-        print(invite)
         invo = InviteOut.parse_dbm_kwargs(
             **invite.dict(),
             from_team=TeamOut.parse_dbm_kwargs(**(team.dict())),
@@ -225,6 +224,15 @@ async def accept_team_invite(
         from_team_oid=team.oid,
         to_user_oid=curr_user.oid
     )
+
+    text_tg=(
+        f"<b>Новый член в комане</b>\n"
+        f"К вам присоеденился {curr_user.fullname}"
+    )
+
+    for user_t in team.user_oids:
+        tu = await get_user(id_=user_t)
+        await send_from_tg_bot(text=text_tg, to_user_ids=[user_t])
 
     return OperationStatusOut(is_done=True)
 
@@ -288,8 +296,11 @@ async def send_team_invite(
         to_user_oid=user.oid
     ) is None:
         raise HTTPException(status_code=400, detail='invite already exists')
-    
-    await send_from_tg_bot(text=f"Вас пригласили в команду {team.title}.", to_user_ids=[user.oid])
+    text_tg=(
+        "<b>Приглашение в команду</b>\n"
+        f"Вас пригласили в команду {team.title}."
+    )
+    await send_from_tg_bot(text=text_tg, to_user_ids=[user.oid])
 
     invite = await create_invite(from_team_oid=team.oid, to_user_oid=user.oid)
     return OperationStatusOut(is_done=True)
