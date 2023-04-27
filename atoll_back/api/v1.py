@@ -338,11 +338,21 @@ async def get_event_feedbacks(
 
 @api_v1_router.get('/event.get_all_requests_to_create_event', tags=['Event'], response_model=list[EventRequestOut])
 async def get_all_event_requests(
+        requestor_int_id: Optional[int] = Query(...),
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin])
         )
 ):
     ev_req = await get_event_requests()
+    if not requestor_int_id is None:
+        requestor = await get_user(id_=requestor_int_id)
+        if requestor is None:
+            raise HTTPException(status_code=400, detail="requestor is None")
+        res = []
+        for event in ev_req:
+            if event.requestor_oid == requestor.oid:
+                res.append(EventRequestOut.parse_dbm_kwargs(**event.dict()))
+        return res
     return [EventRequestOut.parse_dbm_kwargs(**event.dict()) for event in
             ev_req]
 
