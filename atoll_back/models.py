@@ -141,8 +141,8 @@ class Event(BaseDBM):
     # db fields
     title: str = Field(alias=EventFields.title)
     description: str = Field(alias=EventFields.title)
-    team_ids: Optional[list[int]] = Field(alias=EventFields.team_ids)
-    creator_id: int = Field(alias=EventFields.author_id)
+    team_ods: Optional[list[ObjectId]] = Field(alias=EventFields.team_oids)
+    author_oid: ObjectId = Field(alias=EventFields.author_oid)
     start_dt: datetime = Field(alias=EventFields.start_dt)
     end_dt: datetime = Field(alias=EventFields.end_dt)
     ratings: list[Rating] = Field(alias=EventFields.ratings)
