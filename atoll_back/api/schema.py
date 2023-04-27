@@ -73,7 +73,6 @@ class EventWithTeamsOut(EventOut):
 class InviteOut(BaseOutDBMSchema):
     from_team_oid: str
     to_user_oid: str
-
     from_team: TeamOut
     to_user: UserOut
 
@@ -169,3 +168,4 @@ class AuthUserIn(BaseSchemaIn):
     code: str
 
 EventWithTeamsOut.update_forward_refs()
+InviteOut.update_forward_refs()
