@@ -4,13 +4,14 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, \
+from atoll_back.api.schema import FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, TeamUpdate, \
     UserOut, UpdateUserIn, InviteOut,\
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamsOut
 from atoll_back.consts import MailCodeTypes, UserRoles
 from atoll_back.core import db
 from atoll_back.db.event import EventFields
+from atoll_back.db.team import TeamFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline, Rating
 from atoll_back.services import accept_invite, create_invite, get_invite, get_invites, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
@@ -289,15 +290,47 @@ async def edit_user_role(
 
 
 @api_v1_router.get('/team.all', tags=['Team'])
-async def get_all_teams():
+async def get_all_teams(
+        curr_user: User = Depends(get_strict_current_user)):
     return await get_teams()
 
 
 @api_v1_router.get('/team.get_by_int_id', response_model=Optional[TeamOut], tags=['Team'])
-async def get_team_by_id(int_id: int = Query(...)):
+async def get_team_by_id(
+        curr_user: User = Depends(get_strict_current_user),
+        int_id: int = Query(...)):
     team = await get_team(id_=int_id)
     if team is None:
         return None
+    team_dict = team.dict()
+    team_dict['users'] = [
+        InTeamUser.parse_dbm_kwargs(
+            **(await get_user(id_=x)).dict(), is_captain=True if x == team_dict['captain_oid'] else False)
+        for x in team_dict['user_oids']
+    ]
+    team_dict.pop('user_oids')
+    return TeamOut.parse_dbm_kwargs(**team_dict)
+
+
+@api_v1_router.post('/team.update', response_model=TeamOut, tags=['Team'])
+async def update_team(
+    curr_user: User = Depends(get_strict_current_user),
+    team_upd: TeamUpdate = Body(...)
+):
+    team = await get_team(id_=team_upd.team_int_id)    
+    if team is None:
+        raise HTTPException(status_code=400, detail="team is None")
+    
+    if not curr_user.oid == team.captain_oid:
+        raise HTTPException(status_code=400, detail="u are not captain of team")
+
+    await db.team_collection.update_document_by_id(
+        id_=team.oid, 
+        set_={
+            TeamFields.description: team_upd.description, 
+            TeamFields.title: team_upd.title
+        })
+    team = await get_team(id_=team_upd.team_int_id)    
     team_dict = team.dict()
     team_dict['users'] = [
         InTeamUser.parse_dbm_kwargs(
