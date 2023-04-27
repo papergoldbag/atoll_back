@@ -159,7 +159,8 @@ class Event(BaseDBM):
     timeline: list[Timeline] = Field(alias=EventFields.timeline)
 
     # direct linked models
-    users: list[User] = Field(default=[])
+    author: Optional[User] = Field(default=None)
+    teams: list[Team] = Field(default=[])
 
 
 class EventRequest(BaseDBM):
@@ -170,8 +171,26 @@ class EventRequest(BaseDBM):
     start_dt: datetime = Field(alias=EventRequestFields.start_dt)
     end_dt: datetime = Field(alias=EventRequestFields.end_dt)
     timeline: list[Timeline] = Field(alias=EventRequestFields.timeline)
+    
+    # direct linked models
+    requestor: Optional[User] = Field(default=None)
 
 
 class Feedback(BaseDBM):
     #db fields
-    ...
+    event_oid: ObjectId = Field(alias=FeedbackFields.event_oid)
+    user_oid: ObjectId = Field(alias=FeedbackFields.user_oid)
+    text: str = Field(alias=FeedbackFields.text)
+
+    # direct linked models
+    user: Optional[User] = Field(default=None)
+    event: Optional[Event] = Field(default=None)
+
+class Invite(BaseDBM):
+    #db fields
+    from_team_oid: ObjectId = Field(alias=InviteFields.from_team_oid)
+    to_user_oid: ObjectId = Field(alias=InviteFields.to_user_oid)
+    
+    # direct linked models
+    user: Optional[User] = Field(default=None)
+    team: Optional[Team] = Field(default=None)
