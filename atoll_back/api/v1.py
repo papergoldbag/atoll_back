@@ -152,7 +152,7 @@ async def me_update(update_user_in: UpdateUserIn, user: User = Depends(get_stric
     )
 
 
-@api_v1_router.get("/me.team_requests", tags=["Me"])
+@api_v1_router.get("/me.requests_to_create_team", tags=["Me"])
 async def get_my_team_requests(user: User = Depends(get_strict_current_user)):
     ...
 
