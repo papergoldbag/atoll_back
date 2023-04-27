@@ -66,7 +66,7 @@ class EventOut(BaseOutDBMSchema):
     ratings: list[RatingOut]
 
 
-class EventWithTeamOut(EventOut):
+class EventWithTeamsOut(EventOut):
     teams: list[TeamOut]
 
 
@@ -156,3 +156,5 @@ class RegUserIn(BaseSchemaIn):
 class AuthUserIn(BaseSchemaIn):
     mail: str
     code: str
+
+EventWithTeamsOut.update_forward_refs()

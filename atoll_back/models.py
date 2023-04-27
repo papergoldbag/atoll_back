@@ -157,7 +157,6 @@ class Event(BaseDBM):
     timeline: list[Timeline] = Field(alias=EventFields.timeline)
 
     # direct linked models
-    author: Optional[User] = Field(default=None)
     teams: list[Team] = Field(default=[])
 
 

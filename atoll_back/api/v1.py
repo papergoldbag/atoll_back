@@ -7,7 +7,7 @@ from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_
 from atoll_back.api.schema import FeedbackIn, FeedbackOut, InTeamUser, OperationStatusOut, SensitiveUserOut, TeamOut, \
     UserOut, UpdateUserIn, \
     UserExistsStatusOut, \
-    RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamOut
+    RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamsOut
 from atoll_back.consts import MailCodeTypes, UserRoles
 from atoll_back.core import db
 from atoll_back.db.event import EventFields
@@ -282,12 +282,14 @@ async def event_join(
     return TeamOut.parse_dbm_kwargs(**(team.dict()))
 
 
-@api_v1_router.get('/event.get_by_int_id', response_model=Optional[EventWithTeamOut], tags=['Event'])
+@api_v1_router.get('/event.get_by_int_id', response_model=Optional[EventWithTeamsOut], tags=['Event'])
 async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_strict_current_user)):
     event = await get_event(id_=int_id)
     if event is None:
         return None
     event_d = event.dict()
+    event_d['oid'] = str(event_d['oid'])
+    event_d.pop('teams')
     event_d['team_oids'] = [str(x) for x in event.team_oids]
     ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
 
@@ -297,12 +299,19 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
             continue
 
         team.users = [
-            InTeamUser.parse_dbm_kwargs(**u.dict(), is_captain=(u.oid == team.captain_oid)) for u in team.users
+            InTeamUser.parse_dbm_kwargs(**(await get_user(id_=u)).dict(), is_captain=(u == team.captain_oid)) for u in team.user_oids
         ]
+        print(team.users)
 
-        # TODO
+        res.append(TeamOut.parse_dbm_kwargs(**(team.dict())))
 
-    return res
+    print(event_d)
+
+    return EventWithTeamsOut(
+        **event_d,
+        ratings=ratings,
+        teams=res
+    )
 
 
 @api_v1_router.post('/event.publish_ratings', tags=['Rating'], response_model=EventOut)
