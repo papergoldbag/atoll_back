@@ -285,8 +285,10 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
     event = await get_event(id_=int_id)
     if event is None:
         return None
-    event_dict = event.dict()
-    return EventOut.parse_dbm_kwargs(**event_dict, ratings=await get_ratings(event_oid=event_dict['oid']))
+    event_d = event.dict()
+    event_d['team_oids'] = [str(x) for x in event.team_oids]
+    ratings = await get_ratings(event_oid=event.oid)
+    return EventOut.parse_dbm_kwargs(**event_d, ratings=await get_ratings(event_oid=event_d['oid']))
 
 
 @api_v1_router.post('/event.publish_ratings', tags=['Rating'], deprecated=True)
