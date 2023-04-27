@@ -119,6 +119,7 @@ class MailCode(BaseDBM):
 
 class Team(BaseDBM):
     # db_fields
+    captain_oid: ObjectId = Field(alias=TeamFields.captain_oid)
     title: str = Field(alias=TeamFields.title)
     description: str = Field(alias=TeamFields.description)
     user_oids: list[ObjectId] = Field(alias=TeamFields.user_oids)
