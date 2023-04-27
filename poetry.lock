@@ -359,6 +359,20 @@ trio = ["trio (>=0.14,<0.23)"]
 wmi = ["wmi (>=1.5.1,<2.0.0)"]
 
 [[package]]
+name = "emoji"
+version = "2.2.0"
+description = "Emoji for Python"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "emoji-2.2.0.tar.gz", hash = "sha256:a2986c21e4aba6b9870df40ef487a17be863cb7778dcf1c01e25917b7cd210bb"},
+]
+
+[package.extras]
+dev = ["coverage", "coveralls", "pytest"]
+
+[[package]]
 name = "fastapi"
 version = "0.95.1"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -978,4 +992,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b26f4ef62c6752c258514f5136d74fc9241ec092bef10a0570020a3b118c3859"
+content-hash = "2f178e1d766562cc4fb0ea343b683cc6a07d73dc476f6e1d82db5c926188b856"
