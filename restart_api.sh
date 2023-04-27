@@ -1,2 +1,2 @@
 git pull
-systemctl restart api
+sudo systemctl restart api
