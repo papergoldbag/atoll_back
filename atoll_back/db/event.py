@@ -8,7 +8,6 @@ class EventFields(BaseFields):
     author_oid = "author_oid"
     start_dt = "start_dt"
     end_dt = "end_dt"
-    ratings = "ratings"
     timeline = "timeline"
 
 
