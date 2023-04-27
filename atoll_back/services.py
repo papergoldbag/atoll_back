@@ -14,7 +14,7 @@ from atoll_back.db.base import Id
 from atoll_back.db.mailcode import MailCodeFields
 from atoll_back.db.user import UserFields
 from atoll_back.helpers import NotSet, is_set
-from atoll_back.models import User, MailCode
+from atoll_back.models import User, MailCode, Event, Team
 from atoll_back.utils import roles_to_list
 
 """USER LOGIC"""
@@ -274,6 +274,14 @@ async def create_mail_code(
     created_mail_code.to_user = to_user
 
     return created_mail_code
+
+
+"""Event logic"""
+
+
+async def get_events() -> list[Event]:
+    events = [Event.parse_document(doc) async for doc in db.user_collection.create_cursor()]
+    return events
 
 
 async def __example():

@@ -2,13 +2,13 @@ from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user
 from atoll_back.api.schema import OperationStatusOut, SensitiveUserOut, UserOut, UpdateUserIn, UserExistsStatusOut, \
-    RegUserIn, AuthUserIn
+    RegUserIn, AuthUserIn, EventOut
 from atoll_back.consts import MailCodeTypes
 from atoll_back.core import db
 from atoll_back.db.user import UserFields
-from atoll_back.models import User
+from atoll_back.models import User, Event, Team
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
-    remove_mail_code, update_user
+    remove_mail_code, update_user, get_events
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -225,9 +225,9 @@ async def update_team():
 """Event"""
 
 
-@api_v1_router.get('/event.all', tags=['Event'])
+@api_v1_router.get('/event.all', response_model=list[EventOut],tags=['Event'])
 async def get_all_events():
-    ...
+    return [EventOut.parse_dbm_kwargs(**x.dict()) for x in (await get_events())]
 
 
 @api_v1_router.post('/event.update', tags=['Event'])
