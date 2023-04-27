@@ -60,13 +60,6 @@ class EventOut(BaseOutDBMSchema):
     ratings: list[RatingOut]
 
 
-class TeamOut(BaseOutDBMSchema):
-    captain_oid: str
-    title: str
-    description: str
-    user_oids: list[str]
-
-
 class InviteOut(BaseOutDBMSchema):
     from_team_oid: str
     to_user_oid: str
@@ -95,6 +88,17 @@ class UserOut(BaseOutDBMSchema):
     tg_id: Optional[str] = None
     roles: list[str] = []
     description: Optional[str] = None
+
+
+class InTeamUser(UserOut):
+    is_captain: bool
+
+
+class TeamOut(BaseOutDBMSchema):
+    captain_oid: str
+    title: str
+    description: str
+    users: list[InTeamUser]
 
 
 class SensitiveUserOut(UserOut):
