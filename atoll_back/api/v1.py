@@ -497,10 +497,10 @@ async def send_support_message(
         user: User = Depends(get_strict_current_user)
 ):
     adms = await get_users(roles=[UserRoles.admin])
-    await send_from_tg_bot(text=text,to_roles=[UserRoles.admin])
+    await send_from_tg_bot(text=f"Сообщение в поддержку: {text}",to_roles=[UserRoles.admin])
     for adm in adms:
         try:
-            await send_mail(to_email=adm.mail, subject="support", text=text)
+            await send_mail(to_email=adm.mail, subject="support", text=f"Сообщение в поддержку: {text}")
         except:
             ...
     return OperationStatusOut(is_done=True)
