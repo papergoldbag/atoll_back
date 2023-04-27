@@ -265,6 +265,11 @@ async def event_join(
     event = await get_event(id_=event_int_id)
     if event is None:
         raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
+    event_teams = event.team_oids
+    for team_oid in event_teams:
+        team_e = await get_team(id_=team_oid)
+        if user.oid in team_e.user_oids:
+            raise HTTPException(status_code=400, detail="u already in event in team")
     team = await create_team(
         captain_oid=user.oid,
         title=user.fullname + " team",
