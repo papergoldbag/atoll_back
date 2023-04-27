@@ -13,7 +13,7 @@ from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
     remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
-    get_event_requests, get_event_request
+    get_event_requests, get_event_request, event_request_to_event
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -307,11 +307,14 @@ async def add_event_requests(
     return EventRequestOut.parse_dbm_kwargs(**(req.dict()))
 
 
-@api_v1_router.get('/event.accept_request_to_create', tags=['Event'], deprecated=True)
+@api_v1_router.get('/event.accept_request_to_create', tags=['Event'], response_model=EventOut)
 async def accept_event_request(
         event_request_int_id: int = Query(...),
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin]))
 ):
-    # TODO
-    ...
+    ev_req = await get_event_request(id_=event_request_int_id)
+    if ev_req is None:
+        raise HTTPException(status_code=400, detail=f"event request with int id {event_request_int_id} doesn't exists")
+    event = await event_request_to_event(event_request_oid=ev_req.oid)
+    return EventOut.parse_dbm_kwargs(**(event.dict()), ratings=await get_ratings(event_oid=event.oid))
