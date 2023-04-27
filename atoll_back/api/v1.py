@@ -213,7 +213,7 @@ async def edit_user_role():
 """TEAM"""
 
 
-@api_v1_router.get('/team.all', tags=['Team'])
+@api_v1_router.get('/teams.get', tags=['Team'])
 async def get_all_teams():
     return await get_teams()
 
