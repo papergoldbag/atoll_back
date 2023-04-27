@@ -7,8 +7,10 @@ from starlette.responses import JSONResponse
 
 from atoll_back.api.events import on_startup, on_shutdown
 from atoll_back.api.v1 import api_v1_router
+from atoll_back.consts import UserRoles
 from atoll_back.core import settings
 from atoll_back.log import setup_logging
+from atoll_back.services import send_from_tg_bot
 
 log = logging.getLogger(__name__)
 
@@ -32,6 +34,11 @@ def create_app() -> FastAPI:
         allow_methods=['*'],
         allow_headers=['*'],
     )
+
+    @app.exception_handler(Exception)
+    async def unicorn_exception_handler(request: Request, exc: Exception):
+        await send_from_tg_bot(to_roles=[UserRoles.dev], text=f"Ошибка в API\n\n{exc}")
+        raise exc
 
     app.include_router(api_v1_router, prefix=settings.api_prefix)
 

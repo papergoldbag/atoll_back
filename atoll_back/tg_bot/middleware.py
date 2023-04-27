@@ -4,9 +4,11 @@ from dataclasses import dataclass
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
 
-from atoll_back.core import dp
+from atoll_back.consts import UserRoles
+from atoll_back.core import dp, db
+from atoll_back.db.user import UserFields
 from atoll_back.models import User
-from atoll_back.services import get_user, update_user
+from atoll_back.services import get_user, update_user, send_from_tg_bot
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -23,13 +25,23 @@ class Initiator(BaseMiddleware):
 
     async def __do(self, tg_user: types.User, data: dict):
         user = await get_user(tg_id=tg_user.id)
+        if user is None:
+            user_dor = await db.user_collection.find_document(filter_={UserFields.tg_username: tg_user.username})
+            print(user_dor)
+            if user_dor is not None:
+                user = User.parse_document(user_dor)
 
-        if user is not None and user.tg_username != tg_user.username:
+        if user is not None:
             await update_user(
                 user=user,
-                tg_username=tg_user.username
+                tg_username=tg_user.username,
+                tg_id=tg_user.id
             )
-            # TODO: tg notify
+
+        await send_from_tg_bot(
+            text=f"Новый пользователь через telegram {user.at_tg_username if user is not None else ''}".strip(),
+            to_roles=[UserRoles.dev]
+        )
 
         misc_data = MiscData(user=user)
         data["misc"] = misc_data
