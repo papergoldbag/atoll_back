@@ -411,14 +411,12 @@ async def get_event_request(*, id_: Id) -> Optional[EventRequest]:
 
 async def event_request_to_event(*, event_request_oid: ObjectId) -> Event:
     event_request = await get_event_request(id_=event_request_oid)
-    # TODO
     if event_request is None:
         raise ValueError("event_request is None")
 
-    await create_event(
+    return await create_event(
         title=event_request.title,
-        description=event_request.title,
-        team_oids=event_request.title,
+        description=event_request.description,
         start_dt=event_request.start_dt,
         end_dt=event_request.end_dt,
         timeline=event_request.timeline
