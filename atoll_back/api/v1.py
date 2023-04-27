@@ -14,7 +14,7 @@ from atoll_back.db.event import EventFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Event, Team, Timeline, Rating
 from atoll_back.services import get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
-    remove_mail_code, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
+    remove_mail_code, send_from_tg_bot, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
     get_event_requests, get_event_request, event_request_to_event, create_team, create_rating, create_feedback, \
     get_feedback, get_feedbacks
 from atoll_back.utils import send_mail
@@ -340,25 +340,39 @@ async def send_feedback(
             make_strict_depends_on_roles([UserRoles.sportsman]))
 ):
     event = await get_event(id_=feedback_in.event_int_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail=f"event with int id {feedback_in.event_int_id} doesn't exists")
     user = await get_user(id_=user.oid)
     feedback = await create_feedback(
         event_oid=event.oid,
         user_oid=user.oid,
         text=feedback_in.text
     )
+    await send_from_tg_bot(
+        text=f"Обратная связь к событию:{event.title}\nОт {user.fullname} \n{feedback.text}",
+        to_roles=[UserRoles.admin, UserRoles.representative, UserRoles.partner]        
+        )
     return FeedbackOut.parse_dbm_kwargs(**feedback.dict())
 
 
-@api_v1_router.get('/event.feedbacks', tags=['Event'], deprecated=True)
+@api_v1_router.get('/event.feedbacks', tags=['Event'], response_model=list[FeedbackOut])
 async def get_event_feedbacks(
-        event_int_id: int = Query(...)
+        event_int_id: Optional[int] = Query(None)
 ):
-    ...
+    e_oid = None
+    if not event_int_id is None:
+        event = await get_event(id_=event_int_id)
+        if event is None:
+            raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
+        e_oid = event.oid
+    feedbacks = [FeedbackOut.parse_dbm_kwargs(**x.dict()) for x in await get_feedbacks(event_id=e_oid)]
+    return feedbacks
+
 
 
 @api_v1_router.get('/event.get_all_requests_to_create_event', tags=['Event'], response_model=list[EventRequestOut])
 async def get_all_event_requests(
-        requestor_int_id: Optional[int] = Query(...),
+        requestor_int_id: Optional[int] = Query(None),
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin])
         )

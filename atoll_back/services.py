@@ -523,8 +523,11 @@ async def get_feedback():
     ...
 
     
-async def get_feedbacks():
-    ...
+async def get_feedbacks(
+        event_id: Optional[ObjectId] = None
+    ) -> list[Feedback]:    
+    feedbacks = [Feedback.parse_document(doc) async for doc in db.feedback_collection.create_cursor() if doc['event_oid'] == event_id or event_id is None]
+    return feedbacks
 
 
 
