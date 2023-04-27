@@ -77,7 +77,6 @@ class EventRequestOut(BaseOutDBMSchema):
 class EventRequestIn(BaseSchemaIn):
     title: str
     description: str
-    requestor_oid: str
     start_dt: datetime
     end_dt: datetime
     timeline: list[TimelineOut]
