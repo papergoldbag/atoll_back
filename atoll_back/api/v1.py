@@ -290,14 +290,19 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
     event_d = event.dict()
     event_d['team_oids'] = [str(x) for x in event.team_oids]
     ratings = [RatingOut.parse_dbm_kwargs(**x.dict()) for x in await get_ratings(event_oid=event.oid)]
-    return EventWithTeamOut.parse_dbm_kwargs(
-        **event_d,
-        ratings=ratings,
-        team=[TeamOut.parse_dbm_kwargs(
-            **team.dict(),
-            users=[InTeamUser.parse_dbm_kwargs(**u.dict(), is_captain=(u.oid == team.captain_oid)) for u in team.users]
-        ) for team in await get_teams() if team.oid in event.team_oids]
-    )
+
+    res = []
+    for team in await get_teams():
+        if team.oid not in event.team_oids:
+            continue
+
+        team.users = [
+            InTeamUser.parse_dbm_kwargs(**u.dict(), is_captain=(u.oid == team.captain_oid)) for u in team.users
+        ]
+
+        # TODO
+
+    return res
 
 
 @api_v1_router.post('/event.publish_ratings', tags=['Rating'], response_model=EventOut)

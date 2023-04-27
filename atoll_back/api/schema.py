@@ -67,7 +67,7 @@ class EventOut(BaseOutDBMSchema):
 
 
 class EventWithTeamOut(EventOut):
-    team: list[TeamOut]
+    teams: list[TeamOut]
 
 
 class InviteOut(BaseOutDBMSchema):
