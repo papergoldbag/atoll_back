@@ -40,12 +40,28 @@
  </ul>
 
 
-# Демо
+# Демо к сайту
 <p>Демо сервиса доступно по адресу: https://atoll.divarteam.ru/</p>
-<p>Админ: </p>
-<p>Спортсмен: </p>
-<p>Партнёр: </p>
-<p>Представитель: </p>
+
+<p>dbarov3@gmail.com - sportsman</p>
+<p>ilyakhakimov03@gmail.com - partner</p>
+<p>sabarsenrash@gmail.com - admin</p>
+<p>recrea.tor@yandex.ru - representative</p>
+<p>ermolovivan2018@gmail.com> - sportsman</p>
+
+<p>code = 1111 для всех</p>
+
+
+# Демо к API
+<p>Демо сервиса доступно по адресу: https://api.atoll.divarteam.ru/docs</p>
+
+<p>dbarov3@gmail.com - sportsman</p>
+<p>ilyakhakimov03@gmail.com - partner</p>
+<p>sabarsenrash@gmail.com - admin</p>
+<p>recrea.tor@yandex.ru - representative</p>
+<p>ermolovivan2018@gmail.com> - sportsman</p>
+
+<p>token = 1111 для всех</p>
 
 
 СРЕДА ЗАПУСКА
