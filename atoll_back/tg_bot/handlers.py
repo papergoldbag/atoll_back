@@ -33,7 +33,7 @@ async def on_cmd_events(message: types.Message):
     if not events:
         text = "Пока что нет мероприятий"
     else:
-        text = ":bookmark_tabs: Мероприятия:\n\n"
+        text = ":bookmark_tabs: Мероприятия\n\n"
         for i, event in enumerate(events):
             i += 1
             text += (
