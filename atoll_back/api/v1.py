@@ -324,6 +324,22 @@ async def edit_user_role(
 """TEAM"""
 
 
+@api_v1_router.get('/team.can_i_go_out', tags=['Team'])
+async def can_i_go_our(
+    curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
+    team_int_id: int = Query(...)
+):  
+    can = True
+    team = await get_team(id_=team_int_id)
+    if team is None:
+        raise HTTPException(status_code=400, detail='team is none')
+    if not curr_user.oid in team.user_oids:
+        raise HTTPException(status_code=400, detail="foreign team")
+    if curr_user.oid == team.captain_oid:
+        can = False
+
+    return {'can': can}
+
 @api_v1_router.get('/team.all', tags=['Team'])
 async def get_all_teams(
         curr_user: User = Depends(get_strict_current_user)):
