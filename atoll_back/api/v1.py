@@ -358,6 +358,19 @@ async def quit_from_team(
     return OperationStatusOut(is_done=True)
 
 
+@api_v1_router.get('/me.my_teams', tags=['Me'], response_model=list[TeamOut])
+async def get_my_teams(
+    curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman]))):
+    teams = await get_teams()
+    
+    res=[]
+
+    for team in teams:
+        if curr_user.oid in team.user_oids:
+            res.append(TeamOut.parse_dbm_kwargs(**team.dict()))
+
+    return res
+
 @api_v1_router.get('/team.all', tags=['Team'])
 async def get_all_teams(
         curr_user: User = Depends(get_strict_current_user)):
