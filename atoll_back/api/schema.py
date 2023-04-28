@@ -90,6 +90,7 @@ class EventRequestOut(BaseOutDBMSchema):
 class EventAnalyticsOut(BaseModel):
     teams_count: int
     mean_teams_participants: int
+    median_teams_participants: int
     participants_count: int
     feedbacks_count: int 
     mean_rate: int
