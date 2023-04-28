@@ -3,6 +3,8 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from aiogram.utils.markdown import quote_html
+
 from atoll_back.consts import RolesType
 from atoll_back.core import settings
 
@@ -19,7 +21,7 @@ def send_mail(to_email: str, subject: str, text: str):
     msg['To'] = to_email
     msg['Subject'] = subject
 
-    body = text
+    body = quote_html(text)
     msg.attach(MIMEText(body, 'plain'))
 
     try:
