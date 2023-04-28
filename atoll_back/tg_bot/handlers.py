@@ -48,7 +48,7 @@ async def on_cmd_events(message: types.Message):
             f"<i>Для подробностей скачайте наше <a href='{settings.front_domain}/'>мобильное приложение с нашего сайта</a></i>"
         )
 
-    await message.answer(text=emojize(text))
+    await message.answer(text=emojize(text), disable_web_page_preview=True)
 
 
 @dp.message_handler(commands=TgBotCommands.site)
