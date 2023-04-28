@@ -58,7 +58,7 @@ async def on_cmd_events(message: types.Message, misc: MiscData):
     if misc.user is None:
         message.answer(text=f"Зарегистрируйтесь на сайте <a href='atoll.divarteam.ru'>Atoll</a>.")
         return
-    events = get_my_events()
+    events = await get_my_events(user_oid=misc.user.oid)
     events = [event for event in events if event.end_dt >= datetime.utcnow()]
 
     if not events:
