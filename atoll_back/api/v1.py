@@ -683,7 +683,7 @@ async def accept_event_request(
     if ev_req is None:
         raise HTTPException(status_code=400, detail=f"event request with int id {event_request_int_id} doesn't exists")
     event = await event_request_to_event(event_request_oid=ev_req.oid)
-    await send_from_tg_bot(text=f"Появилось новое мероприятие {event.title}.", to_roles=UserRoles.set())
+    await send_from_tg_bot(text=f"<b>Появилось новое мероприятие {event.title}.</b>\nПодробнее: <a href='atoll.divarteam.ru/events/{event.int_id}'></a>", to_roles=UserRoles.set())
     for userm in await get_users():
         try:
             send_mail(userm.mail, subject="Новое мероприятие", text=f"Появилось новое мероприятие {event.title}.")
