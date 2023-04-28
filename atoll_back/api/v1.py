@@ -237,6 +237,17 @@ async def accept_team_invite(
     return OperationStatusOut(is_done=True)
 
 
+@api_v1_router.get('/me.scream', tags=['Me'], response_model=OperationStatusOut)
+async def sceream_to_all(
+    text: str = Query(...),
+    user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.admin]))):
+    await send_from_tg_bot(text=text, to_roles=UserRoles.set())
+    users = await get_users()
+    for user in users:
+        send_mail(to_email=user.mail, subject="",text=text)
+    return OperationStatusOut(is_done=True)
+
+
 """USER"""
 
 
