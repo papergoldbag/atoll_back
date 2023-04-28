@@ -458,6 +458,17 @@ async def event_request_to_event(*, event_request_oid: ObjectId) -> Event:
 """EVENT LOGIC"""
 
 
+async def get_my_events(
+        *,
+        user_oid: ObjectId
+    ):
+    teams: list = [x.oid for x in await get_teams() if user_oid in x.user_oids]
+    events = [x for x in await get_events() if len(set(teams) & set(x.team_oids)) > 0]
+    return events
+
+
+
+
 async def get_event_analytics(*, id_: Id):
     event = await get_event(id_=id_)
     if event is None:
