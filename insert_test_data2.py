@@ -36,7 +36,7 @@ async def insert_test_data():
         'tg_username': "rcr_tg",
         'tg_id': "373740493",
         'vk_id': "",
-        'roles': [UserRoles.sportsman],
+        'roles': [UserRoles.dev],
         'description': ""
     })
     await db.user_collection.insert_document({
@@ -76,7 +76,7 @@ async def insert_test_data():
 
     for i in range(5):
         tu1: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': "Sportsman1_{i}",
+            'fullname': f"Sportsman1_{i}",
             'mail': f"tu1_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
@@ -87,7 +87,7 @@ async def insert_test_data():
             'description': ""
         }))
         tu2: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': "Sportsman2_{i}",
+            'fullname': f"Sportsman2_{i}",
             'mail': f"tu2_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
@@ -98,7 +98,7 @@ async def insert_test_data():
             'description': ""
         }))
         tu3: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': "Sportsman3_{i}",
+            'fullname': f"Sportsman3_{i}",
             'mail': f"tu3_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
