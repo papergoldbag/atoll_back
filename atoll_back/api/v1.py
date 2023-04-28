@@ -552,6 +552,24 @@ async def get_event_feedbacks(
     return feedbacks
 
 
+@api_v1_router.get('/event.users_for_inventation', response_model=list[UserOut],tags=['Event'])
+async def get_users_for_inventation(
+        event_int_id: int = Query(...),
+        curr_user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.sportsman])
+        )
+    ):
+    event = await get_event(id_=event_int_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
+    usrs = await get_users(roles=[UserRoles.sportsman])
+    teams_usrs = [await get_user(id_=y) for x in event.team_oids for y in (await get_team(id_=x)).user_oids]
+    usrs = [x for x in usrs if not x in teams_usrs]
+
+    return [UserOut.parse_dbm_kwargs(**x.dict()) for x in usrs]
+
+
+
 
 @api_v1_router.get('/event.get_all_requests_to_create_event', tags=['Event'], response_model=list[EventRequestOut])
 async def get_all_event_requests(

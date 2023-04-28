@@ -158,7 +158,7 @@ class Rating(BaseDBM):
 class Event(BaseDBM):
     # db fields
     title: str = Field(alias=EventFields.title)
-    description: str = Field(alias=EventFields.title)
+    description: str = Field(alias=EventFields.description)
     team_oids: Optional[list[ObjectId]] = Field(alias=EventFields.team_oids)
     start_dt: datetime = Field(alias=EventFields.start_dt)
     end_dt: datetime = Field(alias=EventFields.end_dt)
