@@ -441,7 +441,7 @@ async def get_analytics(event_int_id: int = Query(...), user: User = Depends(mak
         median_teams_participants = int(median(event_teams)),
         participants_count = sum(event_teams),
         feedbacks_count = len(feedbacks),
-        mean_rate = int(mean(feedbacks)),
+        mean_rate = int(mean(feedbacks)) if feedbacks else 0,
         median_rate = int(median(feedbacks))
     )
 
