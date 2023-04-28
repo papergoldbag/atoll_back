@@ -22,10 +22,13 @@ def send_mail(to_email: str, subject: str, text: str):
     body = text
     msg.attach(MIMEText(body, 'plain'))
 
-    server = smtplib.SMTP_SSL(settings.mailru_server, settings.mailru_port)
-    server.login(settings.mailru_login, settings.mailru_password)
-    server.sendmail(settings.mailru_login, to_email, msg.as_string())
-    server.quit()
+    try:
+        server = smtplib.SMTP_SSL(settings.mailru_server, settings.mailru_port)
+        server.login(settings.mailru_login, settings.mailru_password)
+        server.sendmail(settings.mailru_login, to_email, msg.as_string())
+        server.quit()
+    except Exception as e:
+        log.exception(e)
 
 
 def roles_to_list(roles: RolesType) -> list[str]:
