@@ -39,7 +39,7 @@ async def on_cmd_events(message: types.Message):
             text += (
                 f"<b>{i}. {event.title}</b>\n"
                 f"{event.description}\n\n"
-                f"<a href='{settings.front_domain}/events/{event.int_id}'>Перейти</a>\n"
+                f"<a href='{settings.front_domain}/events/{event.int_id}'>Подробнее</a>\n"
                 f"<i>Начало: {event.start_dt.date()}</i>\n"
                 f"<i>Конец: {event.end_dt.date()}\n\n</i>"
             )
