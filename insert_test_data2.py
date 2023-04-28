@@ -12,6 +12,7 @@ from atoll_back.services import create_user, create_team, create_event, create_r
 
 async def insert_test_data():
     setup_logging()
+    await db.ensure_all_indexes()
     await db.user_collection.drop_collection()
     
     await db.user_collection.insert_document({
@@ -126,7 +127,7 @@ async def insert_test_data():
 
     await db.user_collection.insert_document({
         'fullname': "Тестовый представитель",
-        'mail': "",
+        'mail': "repr@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "no exists",
@@ -137,7 +138,7 @@ async def insert_test_data():
     })
     await db.user_collection.insert_document({
         'fullname': "Тестовый Партнер",
-        'mail': "",
+        'mail': "part@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "",
@@ -150,7 +151,7 @@ async def insert_test_data():
 
     await db.user_collection.insert_document({
         'fullname': "Dev1",
-        'mail': "",
+        'mail': "dev@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "",
