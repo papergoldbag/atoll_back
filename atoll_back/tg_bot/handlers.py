@@ -6,7 +6,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from emoji import emojize
 
 from atoll_back.consts import TgBotCommands
-from atoll_back.core import dp, db
+from atoll_back.core import dp, db, settings
 from atoll_back.models import Event
 from atoll_back.tg_bot.middleware import MiscData
 
@@ -38,13 +38,14 @@ async def on_cmd_events(message: types.Message):
             i += 1
             text += (
                 f"<b>{i}. {event.title}</b>\n"
-                f"{event.description}\n"
+                f"{event.description}\n\n"
+                f"<a href='{settings.front_domain}/events/{event.int_id}'>Перейти</a>\n"
                 f"<i>Начало: {event.start_dt.date()}</i>\n"
                 f"<i>Конец: {event.end_dt.date()}\n\n</i>"
             )
             pass
         text += (
-            "<i>Для подробностей скачайте наше <a href='https://atoll.divarteam.ru/'>мобильное приложение с нашего сайта</a></i>"
+            f"<i>Для подробностей скачайте наше <a href='{settings.front_domain}/'>мобильное приложение с нашего сайта</a></i>"
         )
 
     await message.answer(text=emojize(text))

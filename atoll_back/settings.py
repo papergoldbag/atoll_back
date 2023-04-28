@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     cache_dirname: str = "cache"
     cache_dirpath: str = os.path.join(BASE_DIRPATH, cache_dirname)
 
+    front_domain: str = "https://atoll.divarteam.ru"
+
     mode: str = Modes.dev
 
     emulate_mail_sending: bool = True
