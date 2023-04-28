@@ -686,7 +686,7 @@ async def accept_event_request(
     await send_from_tg_bot(text=f"<b>Появилось новое мероприятие {event.title}.</b>\nПодробнее: <a href='atoll.divarteam.ru/events/{event.int_id}'></a>", to_roles=UserRoles.set())
     for userm in await get_users():
         try:
-            send_mail(userm.mail, subject="Новое мероприятие", text=f"Появилось новое мероприятие {event.title}.")
+            send_mail(userm.mail, subject="Новое мероприятие", text=f"<b>Появилось новое мероприятие {event.title}.</b>\nПодробнее: <a href='atoll.divarteam.ru/events/{event.int_id}'></a>")
         except:
             ...
     return EventOut.parse_dbm_kwargs(
