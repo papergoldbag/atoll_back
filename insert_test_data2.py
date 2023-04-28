@@ -15,11 +15,11 @@ async def insert_test_data():
 
     await db.user_collection.insert_document({
         'fullname': "Arsen",
-        'mail': "",
+        'mail': "sabarsenrash@gmail.com",
         'tokens': [],
         'birth_dt': None,
-        'tg_username': "",
-        'tg_id': "",
+        'tg_username': "arpakit",
+        'tg_id': "269870432",
         'vk_id': "",
         'roles': [UserRoles.admin],
         'description': ""
@@ -28,44 +28,44 @@ async def insert_test_data():
     
     await db.user_collection.insert_document({
         'fullname': "Rustam",
-        'mail': "",
+        'mail': "recrea.tor@yandex.ru",
         'tokens': [],
         'birth_dt': None,
-        'tg_username': "",
-        'tg_id': "",
+        'tg_username': "rcr_tg",
+        'tg_id': "373740493",
         'vk_id': "",
         'roles': [UserRoles.sportsman],
         'description': ""
     })
     await db.user_collection.insert_document({
         'fullname': "Ilya",
-        'mail': "",
+        'mail': "ilyakhakimov03@gmail.com",
         'tokens': [],
         'birth_dt': None,
-        'tg_username': "",
-        'tg_id': "",
+        'tg_username': "pirat2003",
+        'tg_id': "1525214974",
         'vk_id': "",
         'roles': [UserRoles.sportsman],
         'description': ""
     })
     await db.user_collection.insert_document({
         'fullname': "Denchik",
-        'mail': "",
+        'mail': "dbarov3@gmail.com",
         'tokens': [],
         'birth_dt': None,
-        'tg_username': "",
-        'tg_id': "",
+        'tg_username': "brightos",
+        'tg_id': "426220634",
         'vk_id': "",
         'roles': [UserRoles.sportsman],
         'description': ""
     })
     await db.user_collection.insert_document({
         'fullname': "Ivanya",
-        'mail': "",
+        'mail': "ermolovivan2018@gmail.com",
         'tokens': [],
         'birth_dt': None,
-        'tg_username': "",
-        'tg_id': "",
+        'tg_username': "ivan_20190721",
+        'tg_id': "457643251",
         'vk_id': "",
         'roles': [UserRoles.sportsman],
         'description': ""
