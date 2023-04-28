@@ -27,7 +27,6 @@ class Initiator(BaseMiddleware):
         user = await get_user(tg_id=tg_user.id)
         if user is None:
             user_dor = await db.user_collection.find_document(filter_={UserFields.tg_username: tg_user.username})
-            print(user_dor)
             if user_dor is not None:
                 user = User.parse_document(user_dor)
 
@@ -37,11 +36,6 @@ class Initiator(BaseMiddleware):
                 tg_username=tg_user.username,
                 tg_id=tg_user.id
             )
-
-        await send_from_tg_bot(
-            text=f"Новый пользователь через telegram {user.at_tg_username if user is not None else ''}".strip(),
-            to_roles=[UserRoles.dev]
-        )
 
         misc_data = MiscData(user=user)
         data["misc"] = misc_data
