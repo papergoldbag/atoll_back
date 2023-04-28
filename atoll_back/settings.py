@@ -28,6 +28,18 @@ class Settings(BaseSettings):
     mailru_port: int = 465
 
     tg_bot_token: str
+    tg_bot_use_webhook: bool = False
+    tg_webhook_host: Optional[str] = None
+    tg_webhook_path: Optional[str] = None
+
+    @property
+    def tg_bot_webhook_url(self) -> Optional[str]:
+        return (
+            f"{self.tg_webhook_host}{self.tg_webhook_path}" if self.tg_webhook_host and self.tg_webhook_path else None
+        )
+
+    tg_bot_web_app_host: Optional[str] = None
+    tg_bot_webapp_port: Optional[int] = None
 
     vk_bot_token: str
     vk_group_id: str = "220168186"
