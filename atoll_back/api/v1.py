@@ -13,6 +13,7 @@ from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, Fe
 from atoll_back.consts import MailCodeTypes, UserRoles
 from atoll_back.core import db
 from atoll_back.db.event import EventFields
+from atoll_back.db.representative_request import RepresentativeRequestFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.user import UserFields
 from atoll_back.models import User, Timeline
@@ -743,3 +744,14 @@ async def add_representative_request(
     repr_d['user'] = UserOut.parse_dbm_kwargs(**repr_req_db.user.dict())
     return RepresentativeRequestOut.parse_dbm_kwargs(
         **repr_d)
+
+
+@api_v1_router.get('/representative_request.accept', tags=['Representative request'], response_model=OperationStatusOut)
+async def representative_request_accept(
+        requestor_int_id: int = Query(...),
+        curr_user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.admin]))):
+    user = await get_user(id_=requestor_int_id)
+    await db.user_collection.update_document_by_id(id_=user.oid, set_={UserFields.roles: [UserRoles.representative]})
+    await db.representative_requests_collection.remove_document(filter_={RepresentativeRequestFields.user_oid: user.oid})
+    return OperationStatusOut(is_done=True)
