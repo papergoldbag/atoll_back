@@ -198,7 +198,8 @@ async def send_from_tg_bot(*, text: str, to_roles: Optional[RolesType] = None, t
         try:
             await bot.send_message(
                 chat_id=user.tg_id,
-                text=text
+                text=text,
+                disable_web_page_preview=True
             )
         except Exception as e:
             log.exception(e)

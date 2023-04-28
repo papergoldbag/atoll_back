@@ -241,12 +241,12 @@ async def accept_team_invite(
 
 @api_v1_router.get('/me.scream', tags=['Me'], response_model=OperationStatusOut)
 async def sceream_to_all(
-    text: str = Query(...),
-    user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.admin]))):
+        text: str = Query(...),
+        user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.admin]))):
     await send_from_tg_bot(text=text, to_roles=UserRoles.set())
     users = await get_users()
     for user in users:
-        send_mail(to_email=user.mail, subject="",text=text)
+        send_mail(to_email=user.mail, subject="", text=text)
     return OperationStatusOut(is_done=True)
 
 
@@ -683,10 +683,19 @@ async def accept_event_request(
     if ev_req is None:
         raise HTTPException(status_code=400, detail=f"event request with int id {event_request_int_id} doesn't exists")
     event = await event_request_to_event(event_request_oid=ev_req.oid)
-    await send_from_tg_bot(text=f"<b>Появилось новое мероприятие {event.title}.</b>\nПодробнее: <a href='atoll.divarteam.ru/events/{event.int_id}'>Событие</a>", to_roles=UserRoles.set())
+    await send_from_tg_bot(
+        text=(
+            f"<b>Появилось новое мероприятие {event.title}\n"
+            f"<a href='https://atoll.divarteam.ru/events/{event.int_id}'>Подробнее</a>'"
+        ),
+        to_roles=UserRoles.set()
+    )
     for userm in await get_users():
         try:
-            send_mail(userm.mail, subject="Новое мероприятие", text=f"<b>Появилось новое мероприятие {event.title}.</b>\nПодробнее: <a href='atoll.divarteam.ru/events/{event.int_id}'></a>")
+            send_mail(userm.mail, subject="Новое мероприятие", text=(
+                f"<b>Появилось новое мероприятие {event.title}\n"
+                f"<a href='https://atoll.divarteam.ru/events/{event.int_id}'>Подробнее</a>'"
+            ))
         except:
             ...
     return EventOut.parse_dbm_kwargs(
@@ -753,5 +762,6 @@ async def representative_request_accept(
             make_strict_depends_on_roles([UserRoles.admin]))):
     user = await get_user(id_=requestor_int_id)
     await db.user_collection.update_document_by_id(id_=user.oid, set_={UserFields.roles: [UserRoles.representative]})
-    await db.representative_requests_collection.remove_document(filter_={RepresentativeRequestFields.user_oid: user.oid})
+    await db.representative_requests_collection.remove_document(
+        filter_={RepresentativeRequestFields.user_oid: user.oid})
     return OperationStatusOut(is_done=True)
