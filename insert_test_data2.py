@@ -15,7 +15,7 @@ async def insert_test_data():
     await db.user_collection.insert_document({
         'fullname': "Arsen",
         'mail': "sabarsenrash@gmail.com",
-        'tokens': ['1111'],
+        'tokens': ['3333'],
         'birth_dt': datetime.utcnow().isoformat(),
         'tg_username': "arpakit",
         'tg_id': "269870432",
@@ -27,7 +27,7 @@ async def insert_test_data():
     await db.user_collection.insert_document({
         'fullname': "Rustam",
         'mail': "recrea.tor@yandex.ru",
-        'tokens': ['1111'],
+        'tokens': ['4444'],
         'birth_dt': datetime.utcnow().isoformat(),
         'tg_username': "rcr_tg",
         'tg_id': "373740493",
@@ -38,7 +38,7 @@ async def insert_test_data():
     await db.user_collection.insert_document({
         'fullname': "Ilya",
         'mail': "ilyakhakimov03@gmail.com",
-        'tokens': ['1111'],
+        'tokens': ['2222'],
         'birth_dt': datetime.utcnow().isoformat(),
         'tg_username': "pirat2003",
         'tg_id': "1525214974",
@@ -49,7 +49,7 @@ async def insert_test_data():
     await db.user_collection.insert_document({
         'fullname': "Denchik",
         'mail': "dbarov3@gmail.com",
-        'tokens': [],
+        'tokens': ["1111"],
         'birth_dt': datetime.utcnow().isoformat(),
         'tg_username': "brightos",
         'tg_id': "426220634",
@@ -60,7 +60,7 @@ async def insert_test_data():
     await db.user_collection.insert_document({
         'fullname': "Ivanya",
         'mail': "ermolovivan2018@gmail.com",
-        'tokens': ['1111'],
+        'tokens': ['5555'],
         'birth_dt': datetime.utcnow().isoformat(),
         'tg_username': "ivan_20190721",
         'tg_id': "457643251",

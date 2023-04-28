@@ -55,13 +55,11 @@
 # Демо к API
 <p>Демо сервиса доступно по адресу: https://api.atoll.divarteam.ru/docs</p>
 
-<p>dbarov3@gmail.com - sportsman</p>
-<p>ilyakhakimov03@gmail.com - partner</p>
-<p>sabarsenrash@gmail.com - admin</p>
-<p>recrea.tor@yandex.ru - representative</p>
-<p>ermolovivan2018@gmail.com> - sportsman</p>
-
-<p>token = 1111 для всех</p>
+<p>dbarov3@gmail.com - sportsman, test_token = 1111</p>
+<p>ilyakhakimov03@gmail.com - partner, test_token = 2222</p>
+<p>sabarsenrash@gmail.com - admin, test_token = 3333</p>
+<p>recrea.tor@yandex.ru - representative, test_token = 4444</p>
+<p>ermolovivan2018@gmail.com> - sportsman, test_token = 5555</p>
 
 
 СРЕДА ЗАПУСКА
