@@ -2,13 +2,12 @@ import asyncio
 import binascii
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from random import randint
 from typing import Union, Optional
 
 import pymongo
 from bson import ObjectId
-from fastapi import HTTPException
 
 from atoll_back.consts import UserRoles, RolesType
 from atoll_back.core import db, bot
@@ -26,7 +25,6 @@ from atoll_back.models import Invite, RepresentativeRequest, User, MailCode, Eve
 from atoll_back.utils import roles_to_list
 
 """USER LOGIC"""
-
 
 log = logging.getLogger()
 
@@ -513,7 +511,7 @@ async def create_feedback(
         user_oid: ObjectId,
         text: str,
         rate: int
-    ) -> Feedback:
+) -> Feedback:
     doc_to_insert = {
         FeedbackFields.event_oid: event_oid,
         FeedbackFields.user_oid: user_oid,
@@ -527,15 +525,16 @@ async def create_feedback(
 
     return created_feedback
 
-    
+
 async def get_feedback():
     ...
 
-    
+
 async def get_feedbacks(
         event_id: Optional[ObjectId] = None
-    ) -> list[Feedback]:    
-    feedbacks = [Feedback.parse_document(doc) async for doc in db.feedback_collection.create_cursor() if doc['event_oid'] == event_id or event_id is None]
+) -> list[Feedback]:
+    feedbacks = [Feedback.parse_document(doc) async for doc in db.feedback_collection.create_cursor() if
+                 doc['event_oid'] == event_id or event_id is None]
     return feedbacks
 
 
@@ -543,13 +542,13 @@ async def get_feedbacks(
 
 
 async def get_invite(
-    *,
-    from_team_oid: ObjectId,
-    to_user_oid: ObjectId
+        *,
+        from_team_oid: ObjectId,
+        to_user_oid: ObjectId
 ) -> Optional[Invite]:
     invite = db.invite_collection.find_document({
-        InviteFields.from_team_oid:from_team_oid,
-        InviteFields.to_user_oid:to_user_oid
+        InviteFields.from_team_oid: from_team_oid,
+        InviteFields.to_user_oid: to_user_oid
     })
     return invite
 
@@ -559,23 +558,23 @@ async def get_invites(
         to_user_oid: ObjectId
 ) -> list[Invite]:
     invites = [Invite.parse_document(x) async for x in db.invite_collection.create_cursor(filter_={
-        InviteFields.to_user_oid:to_user_oid
+        InviteFields.to_user_oid: to_user_oid
     })]
     return invites
 
 
 async def accept_invite(
-    *,
-    from_team_oid: ObjectId,
-    to_user_oid: ObjectId
+        *,
+        from_team_oid: ObjectId,
+        to_user_oid: ObjectId
 ):
     invite = Invite.parse_document(await db.invite_collection.find_document({
-        InviteFields.from_team_oid : from_team_oid,
-        InviteFields.to_user_oid : to_user_oid
+        InviteFields.from_team_oid: from_team_oid,
+        InviteFields.to_user_oid: to_user_oid
     }))
-    if invite is None:        
+    if invite is None:
         raise ValueError("invite is None")
-    
+
     await db.invite_collection.remove_by_oid(invite.oid)
 
     await db.team_collection.update_document_by_id(id_=from_team_oid, push={TeamFields.user_oids: to_user_oid})
@@ -585,7 +584,7 @@ async def create_invite(
         *,
         from_team_oid: ObjectId,
         to_user_oid: ObjectId
-    ) -> Invite:    
+) -> Invite:
     doc_to_insert = {
         InviteFields.from_team_oid: from_team_oid,
         InviteFields.to_user_oid: to_user_oid,
@@ -602,15 +601,16 @@ async def create_invite(
 
 
 async def get_representative_requests() -> list[RepresentativeRequest]:
-    representative_requests = [RepresentativeRequest.parse_document(x) async for x in db.representative_requests_collection.create_cursor()]
+    representative_requests = [RepresentativeRequest.parse_document(x) async for x in
+                               db.representative_requests_collection.create_cursor()]
     return representative_requests
 
 
 async def create_representative_request(
-    *,
-    user_oid: ObjectId,
-    user_int_id: int
-    ) -> RepresentativeRequest:
+        *,
+        user_oid: ObjectId,
+        user_int_id: int
+) -> RepresentativeRequest:
     doc_to_insert = {
         RepresentativeRequestFields.user_oid: user_oid,
         RepresentativeRequestFields.user_int_id: user_int_id,

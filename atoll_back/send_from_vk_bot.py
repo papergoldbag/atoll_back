@@ -8,7 +8,6 @@ from atoll_back.db.base import Id
 from atoll_back.models import User
 from atoll_back.services import get_user, get_users
 
-
 log = logging.getLogger(__name__)
 
 
@@ -39,4 +38,3 @@ async def __example():
 
 if __name__ == '__main__':
     asyncio.run(__example())
-

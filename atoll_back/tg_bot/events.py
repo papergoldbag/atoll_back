@@ -1,7 +1,6 @@
 import logging
 
-from aiogram.dispatcher.filters import Command
-from aiogram.types import BotCommand, BotCommandScopeChat
+from aiogram.types import BotCommand
 from emoji import emojize
 
 from atoll_back.consts import UserRoles, TgBotCommands

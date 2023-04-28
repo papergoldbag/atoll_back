@@ -25,4 +25,3 @@ class InlineKb:
             callback_data=cls.cd_main_menu.new()
         ))
         return kb
-

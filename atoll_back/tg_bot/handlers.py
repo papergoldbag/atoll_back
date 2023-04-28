@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import Optional
 
 from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -8,8 +7,7 @@ from emoji import emojize
 
 from atoll_back.consts import TgBotCommands
 from atoll_back.core import dp, db
-from atoll_back.models import Event, User
-from atoll_back.services import get_events, get_user
+from atoll_back.models import Event
 from atoll_back.tg_bot.middleware import MiscData
 
 log = logging.getLogger(__name__)

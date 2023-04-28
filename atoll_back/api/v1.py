@@ -1,14 +1,13 @@
-from typing import Optional
-from bson import ObjectId
-
 from statistics import median, mean
+from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query, status, Depends, Body
 
 from atoll_back.api.deps import get_strict_current_user, make_strict_depends_on_roles
-from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, FeedbackWithBody, InTeamUser, OperationStatusOut, \
+from atoll_back.api.schema import EventAnalyticsOut, FeedbackIn, FeedbackOut, FeedbackWithBody, InTeamUser, \
+    OperationStatusOut, \
     RepresentativeRequestOut, SensitiveUserOut, TeamOut, TeamUpdate, \
-    UserOut, UpdateUserIn, InviteOut,\
+    UserOut, UpdateUserIn, InviteOut, \
     UserExistsStatusOut, \
     RegUserIn, AuthUserIn, EventOut, RatingOut, EventRequestIn, EventRequestOut, RatingIn, EventWithTeamsOut
 from atoll_back.consts import MailCodeTypes, UserRoles
@@ -16,11 +15,13 @@ from atoll_back.core import db
 from atoll_back.db.event import EventFields
 from atoll_back.db.team import TeamFields
 from atoll_back.db.user import UserFields
-from atoll_back.models import User, Event, Team, Timeline, Rating
-from atoll_back.services import accept_invite, create_invite, create_representative_request, get_invite, get_invites, get_representative_requests, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
-    remove_mail_code, send_from_tg_bot, update_user, get_events, get_ratings, get_teams, get_team, get_event, create_event_request, \
+from atoll_back.models import User, Timeline
+from atoll_back.services import accept_invite, create_invite, create_representative_request, get_invite, get_invites, \
+    get_representative_requests, get_user, get_mail_codes, create_mail_code, generate_token, create_user, get_users, \
+    remove_mail_code, send_from_tg_bot, update_user, get_events, get_ratings, get_teams, get_team, get_event, \
+    create_event_request, \
     get_event_requests, get_event_request, event_request_to_event, create_team, create_rating, create_feedback, \
-    get_feedback, get_feedbacks
+    get_feedbacks
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -158,8 +159,8 @@ async def get_me(user: User = Depends(get_strict_current_user)):
 
 @api_v1_router.get("/me.my_requests", response_model=list[EventRequestOut], tags=["Me"])
 async def get_my_requests(user: User = Depends(
-            make_strict_depends_on_roles([UserRoles.representative, UserRoles.partner])
-        )
+    make_strict_depends_on_roles([UserRoles.representative, UserRoles.partner])
+)
 ):
     ev_req = await get_event_requests()
     requestor = user
@@ -219,13 +220,13 @@ async def accept_team_invite(
     team = await get_team(id_=from_team_int_id)
     if team is None:
         raise HTTPException(status_code=400, detail="team is None")
-    
+
     await accept_invite(
         from_team_oid=team.oid,
         to_user_oid=curr_user.oid
     )
 
-    text_tg=(
+    text_tg = (
         f"<b>Новый член в комане</b>\n"
         f"К вам присоеденился {curr_user.fullname}"
     )
@@ -291,23 +292,23 @@ async def send_team_invite(
         curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
         from_team_int_id: int = Query(...),
         to_user_int_id: int = Query(...)
-    ):
+):
     team = await get_team(id_=from_team_int_id)
     if team is None:
         raise HTTPException(status_code=400, detail="team is None")
     user = await get_user(id_=to_user_int_id)
     if user is None:
         raise HTTPException(status_code=400, detail="user is None")
-    
+
     if not curr_user.oid == team.captain_oid:
         raise HTTPException(status_code=400, detail="u are not captain of team")
 
     if await get_invite(
-        from_team_oid=team.oid,
-        to_user_oid=user.oid
+            from_team_oid=team.oid,
+            to_user_oid=user.oid
     ) is None:
         raise HTTPException(status_code=400, detail='invite already exists')
-    text_tg=(
+    text_tg = (
         "<b>Приглашение в команду</b>\n"
         f"Вас пригласили в команду {team.title}."
     )
@@ -318,17 +319,17 @@ async def send_team_invite(
 
 
 @api_v1_router.get('/user.edit_role', response_model=UserOut, tags=['User'])
-async def edit_user_role(        
+async def edit_user_role(
         curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.admin])),
         user_int_id: int = Query(...),
         role: str = Query(...)
-    ):
+):
     user = await get_user(id_=user_int_id)
     if user is None:
         raise HTTPException(status_code=400, detail="user is none")
     if not role in UserRoles.set():
         raise HTTPException(status_code=400, detail="invalid role")
-    await db.user_collection.update_document_by_id(id_=user.oid, set_={UserFields.roles:[role]})
+    await db.user_collection.update_document_by_id(id_=user.oid, set_={UserFields.roles: [role]})
     return UserOut.parse_dbm_kwargs(**(await get_user(id_=user.oid)).dict())
 
 
@@ -337,9 +338,9 @@ async def edit_user_role(
 
 @api_v1_router.get('/team.can_i_go_out', tags=['Team'])
 async def can_i_go_out(
-    curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
-    team_int_id: int = Query(...)
-):  
+        curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
+        team_int_id: int = Query(...)
+):
     can = True
     team = await get_team(id_=team_int_id)
     if team is None:
@@ -354,8 +355,8 @@ async def can_i_go_out(
 
 @api_v1_router.get('/team.quit_from_team', tags=['Team'], response_model=OperationStatusOut)
 async def quit_from_team(
-    curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
-    team_int_id: int = Query(...)
+        curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman])),
+        team_int_id: int = Query(...)
 ):
     team = await get_team(id_=team_int_id)
     if team is None:
@@ -371,16 +372,17 @@ async def quit_from_team(
 
 @api_v1_router.get('/me.my_teams', tags=['Me'], response_model=list[TeamOut])
 async def get_my_teams(
-    curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman]))):
+        curr_user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.sportsman]))):
     teams = await get_teams()
-    
-    res=[]
+
+    res = []
 
     for team in teams:
         if curr_user.oid in team.user_oids:
             res.append(TeamOut.parse_dbm_kwargs(**team.dict()))
 
     return res
+
 
 @api_v1_router.get('/team.all', tags=['Team'])
 async def get_all_teams(
@@ -407,23 +409,23 @@ async def get_team_by_id(
 
 @api_v1_router.post('/team.update', response_model=TeamOut, tags=['Team'])
 async def update_team(
-    curr_user: User = Depends(get_strict_current_user),
-    team_upd: TeamUpdate = Body(...)
+        curr_user: User = Depends(get_strict_current_user),
+        team_upd: TeamUpdate = Body(...)
 ):
-    team = await get_team(id_=team_upd.team_int_id)    
+    team = await get_team(id_=team_upd.team_int_id)
     if team is None:
         raise HTTPException(status_code=400, detail="team is None")
-    
+
     if not curr_user.oid == team.captain_oid:
         raise HTTPException(status_code=400, detail="u are not captain of team")
 
     await db.team_collection.update_document_by_id(
-        id_=team.oid, 
+        id_=team.oid,
         set_={
-            TeamFields.description: team_upd.description, 
+            TeamFields.description: team_upd.description,
             TeamFields.title: team_upd.title
         })
-    team = await get_team(id_=team_upd.team_int_id)    
+    team = await get_team(id_=team_upd.team_int_id)
     team_dict = team.dict()
     team_dict['users'] = [
         InTeamUser.parse_dbm_kwargs(
@@ -438,7 +440,8 @@ async def update_team(
 
 
 @api_v1_router.get('/event.analytics', tags=['Event'], response_model=EventAnalyticsOut)
-async def get_analytics(event_int_id: int = Query(...), user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.admin]))):
+async def get_analytics(event_int_id: int = Query(...),
+                        user: User = Depends(make_strict_depends_on_roles(roles=[UserRoles.admin]))):
     event = await get_event(id_=event_int_id)
     if event is None:
         raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
@@ -447,18 +450,16 @@ async def get_analytics(event_int_id: int = Query(...), user: User = Depends(mak
     feedbacks = [x.rate for x in await get_feedbacks(event_id=event.oid)]
 
     a_d = dict(
-        teams_count = len(event_teams),
-        mean_teams_participants = int(mean(event_teams)),
-        median_teams_participants = int(median(event_teams)),
-        participants_count = sum(event_teams),
-        feedbacks_count = len(feedbacks),
-        mean_rate = int(mean(feedbacks)),
-        median_rate = int(median(feedbacks))
+        teams_count=len(event_teams),
+        mean_teams_participants=int(mean(event_teams)),
+        median_teams_participants=int(median(event_teams)),
+        participants_count=sum(event_teams),
+        feedbacks_count=len(feedbacks),
+        mean_rate=int(mean(feedbacks)) if feedbacks else 0,
+        median_rate=int(median(feedbacks)) if feedbacks else 0
     )
 
     return EventAnalyticsOut.parse_obj(a_d)
-
-
 
 
 @api_v1_router.get('/event.all', response_model=list[EventOut], tags=['Event'])
@@ -468,7 +469,8 @@ async def get_all_events(user: User = Depends(get_strict_current_user)):
     for event in events:
         event_d = event.dict()
         event_d['team_oids'] = [str(x) for x in event.team_oids]
-        ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
+        ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in
+                   await get_ratings(event_oid=event.oid)]
         events_out.append(EventOut.parse_dbm_kwargs(**event_d, ratings=ratings))
 
     return events_out
@@ -506,7 +508,8 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
     event_d['oid'] = str(event_d['oid'])
     event_d.pop('teams')
     event_d['team_oids'] = [str(x) for x in event.team_oids]
-    ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
+    ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in
+               await get_ratings(event_oid=event.oid)]
 
     is_my = False
 
@@ -517,11 +520,11 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
         if user.oid in team.user_oids:
             is_my = True
         team.users = [
-            InTeamUser.parse_dbm_kwargs(**(await get_user(id_=u)).dict(), is_captain=(u == team.captain_oid)) for u in team.user_oids
+            InTeamUser.parse_dbm_kwargs(**(await get_user(id_=u)).dict(), is_captain=(u == team.captain_oid)) for u in
+            team.user_oids
         ]
 
         res.append(TeamOut.parse_dbm_kwargs(**(team.dict())))
-
 
     return EventWithTeamsOut(
         **event_d,
@@ -546,7 +549,8 @@ async def publish_ratings(
         await create_rating(event_oid=event.oid, team_oid=team.oid, place=rate.place)
     event_d = event.dict()
     event_d['team_oids'] = [str(x) for x in event.team_oids]
-    ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
+    ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in
+               await get_ratings(event_oid=event.oid)]
     return EventOut.parse_dbm_kwargs(**event_d, ratings=ratings)
 
 
@@ -556,7 +560,7 @@ async def send_feedback(
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.sportsman]))
 ):
-    if feedback_in.rate<1 or feedback_in.rate>5:
+    if feedback_in.rate < 1 or feedback_in.rate > 5:
         raise HTTPException(status_code=400, detail="rate must be >=1 and <=5")
     event = await get_event(id_=feedback_in.event_int_id)
     if event is None:
@@ -568,7 +572,7 @@ async def send_feedback(
         text=feedback_in.text,
         rate=feedback_in.rate
     )
-    text_tg=(
+    text_tg = (
         "<b>Обратная связь</b>\n"
         f"Отправитель: {user.fullname}\n"
         f"Сообщение: {feedback.text}\n"
@@ -576,8 +580,8 @@ async def send_feedback(
     )
     await send_from_tg_bot(
         text=text_tg,
-        to_roles=[UserRoles.admin, UserRoles.representative, UserRoles.partner]        
-        )
+        to_roles=[UserRoles.admin, UserRoles.representative, UserRoles.partner]
+    )
     return FeedbackOut.parse_dbm_kwargs(**feedback.dict())
 
 
@@ -598,7 +602,8 @@ async def get_event_feedbacks(
         event = await get_event(id_=feedback.event_oid)
         event_d = event.dict()
         event_d['team_oids'] = [str(x) for x in event.team_oids]
-        ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
+        ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in
+                   await get_ratings(event_oid=event.oid)]
         event_o = EventOut.parse_dbm_kwargs(**event_d, ratings=ratings)
         user_o = UserOut.parse_dbm_kwargs(**(await get_user(id_=feedback.user_oid)).dict())
         feedbacks.append(FeedbackWithBody.parse_dbm_kwargs(
@@ -606,18 +611,17 @@ async def get_event_feedbacks(
             event=event_o,
             user=user_o
         ))
-        
 
     return feedbacks
 
 
-@api_v1_router.get('/event.users_for_inventation', response_model=list[UserOut],tags=['Event'])
+@api_v1_router.get('/event.users_for_inventation', response_model=list[UserOut], tags=['Event'])
 async def get_users_for_inventation(
         event_int_id: int = Query(...),
         curr_user: User = Depends(
             make_strict_depends_on_roles([UserRoles.sportsman])
         )
-    ):
+):
     event = await get_event(id_=event_int_id)
     if event is None:
         raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
@@ -626,8 +630,6 @@ async def get_users_for_inventation(
     usrs = [x for x in usrs if not x in teams_usrs]
 
     return [UserOut.parse_dbm_kwargs(**x.dict()) for x in usrs]
-
-
 
 
 @api_v1_router.get('/event.get_all_requests_to_create_event', tags=['Event'], response_model=list[EventRequestOut])
@@ -658,7 +660,7 @@ async def add_event_requests(
             make_strict_depends_on_roles([UserRoles.admin, UserRoles.representative, UserRoles.partner]))
 ):
     if event_data.end_dt < event_data.start_dt:
-        raise HTTPException(status_code=400, detail="end_dt must be greater than start_dt") 
+        raise HTTPException(status_code=400, detail="end_dt must be greater than start_dt")
     req = await create_event_request(
         title=event_data.title,
         description=event_data.description,
@@ -688,19 +690,21 @@ async def accept_event_request(
             ...
     return EventOut.parse_dbm_kwargs(
         **(event.dict()),
-        ratings=[RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
+        ratings=[RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in
+                 await get_ratings(event_oid=event.oid)]
     )
 
 
 """SUPPORT"""
 
+
 @api_v1_router.get('/support', response_model=OperationStatusOut, tags=['Support'])
-async def send_support_message(    
+async def send_support_message(
         text: str = Query(...),
         user: User = Depends(get_strict_current_user)
 ):
     adms = await get_users(roles=[UserRoles.admin])
-    await send_from_tg_bot(text=f"Сообщение в поддержку: {text}",to_roles=[UserRoles.admin])
+    await send_from_tg_bot(text=f"Сообщение в поддержку: {text}", to_roles=[UserRoles.admin])
     for adm in adms:
         try:
             await send_mail(to_email=adm.mail, subject="support", text=f"Сообщение в поддержку: {text}")
@@ -712,11 +716,12 @@ async def send_support_message(
 """REPRESANTATIVE REQUESTS"""
 
 
-@api_v1_router.get('/representative_request.all', tags=['Representative request'], response_model=list[RepresentativeRequestOut])
+@api_v1_router.get('/representative_request.all', tags=['Representative request'],
+                   response_model=list[RepresentativeRequestOut])
 async def get_all_representative_request(
         user: User = Depends(
             make_strict_depends_on_roles([UserRoles.admin]))
-    ):
+):
     repr_req = []
     for repr in await get_representative_requests():
         repr_d = repr.dict()
@@ -725,10 +730,11 @@ async def get_all_representative_request(
     return repr_req
 
 
-@api_v1_router.post('/representative_request.add', tags=['Representative request'], response_model=RepresentativeRequestOut)
+@api_v1_router.post('/representative_request.add', tags=['Representative request'],
+                    response_model=RepresentativeRequestOut)
 async def add_representative_request(
-    user: User = Depends(
-        make_strict_depends_on_roles([UserRoles.sportsman]))):
+        user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.sportsman]))):
     repr_req_db = await create_representative_request(
         user_oid=user.oid,
         user_int_id=user.int_id
@@ -737,5 +743,3 @@ async def add_representative_request(
     repr_d['user'] = UserOut.parse_dbm_kwargs(**repr_req_db.user.dict())
     return RepresentativeRequestOut.parse_dbm_kwargs(
         **repr_d)
-
-
