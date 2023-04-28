@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional, Any
 
 from bson import ObjectId
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, Extra
 
 
 class BaseSchema(BaseModel):
@@ -92,7 +92,7 @@ class EventAnalyticsOut(BaseModel):
     mean_teams_participants: int
     median_teams_participants: int
     participants_count: int
-    feedbacks_count: int 
+    feedbacks_count: int
     mean_rate: int
     median_rate: int
 

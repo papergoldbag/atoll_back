@@ -11,13 +11,13 @@ from pydantic.fields import ModelField
 from atoll_back.consts import RolesType
 from atoll_back.db.base import BaseFields, Document
 from atoll_back.db.event import EventFields
+from atoll_back.db.event_request import EventRequestFields
+from atoll_back.db.feedback import FeedbackFields
+from atoll_back.db.invite import InviteFields
 from atoll_back.db.mailcode import MailCodeFields
 from atoll_back.db.rating import RatingFields
 from atoll_back.db.representative_request import RepresentativeRequestFields
 from atoll_back.db.team import TeamFields
-from atoll_back.db.event_request import EventRequestFields
-from atoll_back.db.invite import InviteFields
-from atoll_back.db.feedback import FeedbackFields
 from atoll_back.db.user import UserFields
 from atoll_back.utils import roles_to_list
 
@@ -176,13 +176,13 @@ class EventRequest(BaseDBM):
     start_dt: datetime = Field(alias=EventRequestFields.start_dt)
     end_dt: datetime = Field(alias=EventRequestFields.end_dt)
     timeline: list[Timeline] = Field(alias=EventRequestFields.timeline)
-    
+
     # direct linked models
     requestor: Optional[User] = Field(default=None)
 
 
 class Feedback(BaseDBM):
-    #db fields
+    # db fields
     event_oid: ObjectId = Field(alias=FeedbackFields.event_oid)
     user_oid: ObjectId = Field(alias=FeedbackFields.user_oid)
     text: str = Field(alias=FeedbackFields.text)
@@ -197,16 +197,16 @@ class Invite(BaseDBM):
     # db fields
     from_team_oid: ObjectId = Field(alias=InviteFields.from_team_oid)
     to_user_oid: ObjectId = Field(alias=InviteFields.to_user_oid)
-    
+
     # direct linked models
     user: Optional[User] = Field(default=None)
     team: Optional[Team] = Field(default=None)
 
 
 class RepresentativeRequest(BaseDBM):
-    #db fields
+    # db fields
     user_oid: ObjectId = Field(alias=RepresentativeRequestFields.user_oid)
     user_int_id: int = Field(alias=RepresentativeRequestFields.user_int_id)
 
-    #direct linked models
+    # direct linked models
     user: Optional[User] = Field(default=None)

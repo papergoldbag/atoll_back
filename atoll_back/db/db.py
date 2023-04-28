@@ -11,7 +11,7 @@ from atoll_back.db.feedback import FeedbackCollection
 from atoll_back.db.invite import InviteCollection
 from atoll_back.db.mailcode import MailCodeCollection
 from atoll_back.db.rating import RatingCollection
-from atoll_back.db.representative_request import RepresentativeRequestCollection, RepresentativeRequestFields
+from atoll_back.db.representative_request import RepresentativeRequestCollection
 from atoll_back.db.team import TeamCollection
 from atoll_back.db.user import UserCollection
 

@@ -4,11 +4,10 @@ from dataclasses import dataclass
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
 
-from atoll_back.consts import UserRoles
 from atoll_back.core import dp, db
 from atoll_back.db.user import UserFields
 from atoll_back.models import User
-from atoll_back.services import get_user, update_user, send_from_tg_bot
+from atoll_back.services import get_user, update_user
 
 
 @dataclass(frozen=True, kw_only=True)
