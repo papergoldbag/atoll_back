@@ -694,7 +694,7 @@ async def accept_event_request(
     await send_from_tg_bot(
         text=(
             f"<b>Появилось новое мероприятие {event.title}\n</b>"
-            f"<a href='https://atoll.divarteam.ru/events/{event.int_id}'>Подробнее</a>'"
+            f"<a href='https://atoll.divarteam.ru/events/{event.int_id}'>Подробнее</a>"
         ),
         to_roles=UserRoles.set()
     )
