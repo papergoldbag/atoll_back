@@ -13,7 +13,7 @@ from atoll_back.db.team import TeamFields
 
 
 async def insert_test_data():
-    l1 = [1,2,3]
+    l1 = []
     l2 = [2,5,3,2,2,5]
     print(set(l1) & set(l2))
     

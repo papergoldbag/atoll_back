@@ -29,3 +29,4 @@ class TgBotCommands(SetForClass):
     echo = "echo"
     events = "events"
     site = "site"
+    my_events = "my_events"

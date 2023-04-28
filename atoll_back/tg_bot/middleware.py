@@ -1,5 +1,6 @@
 import logging
 from dataclasses import dataclass
+from typing import Optional
 
 from aiogram import types
 from aiogram.dispatcher.middlewares import BaseMiddleware
@@ -12,7 +13,7 @@ from atoll_back.services import get_user, update_user
 
 @dataclass(frozen=True, kw_only=True)
 class MiscData:
-    user: User
+    user: Optional[User]
 
 
 class Initiator(BaseMiddleware):

@@ -8,6 +8,7 @@ from emoji import emojize
 from atoll_back.consts import TgBotCommands
 from atoll_back.core import dp, db, settings
 from atoll_back.models import Event
+from atoll_back.services import get_my_events
 from atoll_back.tg_bot.middleware import MiscData
 
 log = logging.getLogger(__name__)
@@ -28,6 +29,36 @@ async def on_cmd_start(message: types.Message, misc: MiscData):
 async def on_cmd_events(message: types.Message):
     event_docs = await db.event_collection.get_all_docs()
     events = [Event.parse_document(event_doc) for event_doc in event_docs]
+    events = [event for event in events if event.end_dt >= datetime.utcnow()]
+
+    if not events:
+        text = "Пока что нет мероприятий"
+    else:
+        text = ":bookmark_tabs: Мероприятия\n\n"
+        for i, event in enumerate(events):
+            i += 1
+            text += (
+                f"<b>{i}. {event.title}</b>\n"
+                f"{event.description}\n\n"
+                f"<a href='{settings.front_domain}/events/{event.int_id}'>Подробнее</a>\n"
+                f"<i>Начало: {event.start_dt.date()}</i>\n"
+                f"<i>Конец: {event.end_dt.date()}\n\n</i>"
+            )
+            pass
+        text += (
+            f"<i>Для подробностей скачайте наше <a href='{settings.front_domain}/'>мобильное приложение с нашего сайта</a></i>"
+        )
+
+    await message.answer(text=emojize(text), disable_web_page_preview=True)
+
+
+
+@dp.message_handler(commands=TgBotCommands.my_events)
+async def on_cmd_events(message: types.Message, misc: MiscData):
+    if misc.user is None:
+        message.answer(text=f"Зарегистрируйтесь на сайте <a href='atoll.divarteam.ru'>Atoll</a>.")
+        return
+    events = get_my_events()
     events = [event for event in events if event.end_dt >= datetime.utcnow()]
 
     if not events:
