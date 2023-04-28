@@ -449,24 +449,26 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
     event_d['team_oids'] = [str(x) for x in event.team_oids]
     ratings = [RatingOut.parse_dbm_kwargs(**x.dict(), team_int_id=(await get_team(id_=x.team_oid)).int_id) for x in await get_ratings(event_oid=event.oid)]
 
+    is_my = False
+
     res = []
     for team in await get_teams():
         if team.oid not in event.team_oids:
             continue
-
+        if user.oid in team.user_oids:
+            is_my = True
         team.users = [
             InTeamUser.parse_dbm_kwargs(**(await get_user(id_=u)).dict(), is_captain=(u == team.captain_oid)) for u in team.user_oids
         ]
-        print(team.users)
 
         res.append(TeamOut.parse_dbm_kwargs(**(team.dict())))
 
-    print(event_d)
 
     return EventWithTeamsOut(
         **event_d,
         ratings=ratings,
-        teams=res
+        teams=res,
+        is_my=is_my
     )
 
 
@@ -548,6 +550,24 @@ async def get_event_feedbacks(
         
 
     return feedbacks
+
+
+@api_v1_router.get('/event.users_for_inventation', response_model=list[UserOut],tags=['Event'])
+async def get_users_for_inventation(
+        event_int_id: int = Query(...),
+        curr_user: User = Depends(
+            make_strict_depends_on_roles([UserRoles.sportsman])
+        )
+    ):
+    event = await get_event(id_=event_int_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail=f"event with int id {event_int_id} doesn't exists")
+    usrs = await get_users(roles=[UserRoles.sportsman])
+    teams_usrs = [await get_user(id_=y) for x in event.team_oids for y in (await get_team(id_=x)).user_oids]
+    usrs = [x for x in usrs if not x in teams_usrs]
+
+    return [UserOut.parse_dbm_kwargs(**x.dict()) for x in usrs]
+
 
 
 

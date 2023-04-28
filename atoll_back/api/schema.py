@@ -68,6 +68,7 @@ class EventOut(BaseOutDBMSchema):
 
 class EventWithTeamsOut(EventOut):
     teams: list[TeamOut]
+    is_my: bool
 
 
 class InviteOut(BaseOutDBMSchema):
