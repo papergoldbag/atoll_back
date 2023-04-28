@@ -12,9 +12,9 @@ from atoll_back.services import create_user, create_team, create_event, create_r
 
 async def insert_test_data():
     setup_logging()
-    await db.ensure_all_indexes()
     await db.user_collection.drop_collection()
-    
+    await db.ensure_all_indexes()
+
     await db.user_collection.insert_document({
         'fullname': "Arsen",
         'mail': "sabarsenrash@gmail.com",
@@ -27,7 +27,6 @@ async def insert_test_data():
         'description': ""
     })
 
-    
     await db.user_collection.insert_document({
         'fullname': "Rustam",
         'mail': "recrea.tor@yandex.ru",
@@ -73,11 +72,10 @@ async def insert_test_data():
         'description': ""
     })
 
-
     for i in range(5):
         tu1: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': f"Sportsman1_{i}",
-            'mail': f"tu1_{i}@test.ru",
+            'fullname': f"Спортсмен 1 {i}",
+            'mail': f"testmailjk1_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
             'tg_username': "",
@@ -87,8 +85,8 @@ async def insert_test_data():
             'description': ""
         }))
         tu2: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': f"Sportsman2_{i}",
-            'mail': f"tu2_{i}@test.ru",
+            'fullname': f"Спортсмен 2 {i}",
+            'mail': f"teskl;tmail2_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
             'tg_username': "",
@@ -98,8 +96,8 @@ async def insert_test_data():
             'description': ""
         }))
         tu3: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': f"Sportsman3_{i}",
-            'mail': f"tu3_{i}@test.ru",
+            'fullname': f"Спортсмен 3 {i}",
+            'mail': f"testhjkmail3_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
             'tg_username': "",
@@ -108,26 +106,25 @@ async def insert_test_data():
             'roles': [UserRoles.sportsman],
             'description': ""
         }))
-        tteam: Team = Team.parse_document(await db.team_collection.insert_document({
+        team: Team = Team.parse_document(await db.team_collection.insert_document({
             'captain_oid': tu1.oid,
             'title': f'test team {i}',
             'description': f"team with {tu1.fullname} {tu2.fullname} {tu3.fullname}",
-            'user_oids': [tu1.oid, tu2.oid, tu3.oid,]
+            'user_oids': [tu1.oid, tu2.oid, tu3.oid, ]
         }))
-        tevent = Event.parse_document(await db.event_collection.insert_document({
-            'title': f'event_{i}',
-            'description': 'event {i}',
-            'team_oids': [tteam.oid],
+        Event.parse_document(await db.event_collection.insert_document({
+            'title': f'Event {i}',
+            'description': f'Description event {i}',
+            'team_oids': [team.oid],
             'start_dt': datetime.now(),
             'end_dt': datetime.now() + timedelta(days=1),
-            'timeline': [Timeline(dt=datetime.now(),text="старт").dict(), 
+            'timeline': [Timeline(dt=datetime.now(), text="старт").dict(),
                          Timeline(dt=datetime.now() + timedelta(days=1), text="конец").dict()],
         }))
 
-
     await db.user_collection.insert_document({
         'fullname': "Тестовый представитель",
-        'mail': "repr@test.ru",
+        'mail': "testmtyuiail1@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "no exists",
@@ -138,7 +135,7 @@ async def insert_test_data():
     })
     await db.user_collection.insert_document({
         'fullname': "Тестовый Партнер",
-        'mail': "part@test.ru",
+        'mail': "testmail2@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "",
@@ -148,10 +145,9 @@ async def insert_test_data():
         'description': ""
     })
 
-
     await db.user_collection.insert_document({
         'fullname': "Dev1",
-        'mail': "dev@test.ru",
+        'mail': "testmail4@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "",
@@ -161,29 +157,28 @@ async def insert_test_data():
         'description': ""
     })
 
-
     await db.event_collection.insert_document({
-    'title': 'Всероссийский хакатон фсп 2023 Воронеж',
-    'description': 'Всероссийский хакатон фсп для студентов',
-    'team_oids': [],
-    'start_dt': datetime.now(),
-    'end_dt': datetime.now() + timedelta(days=2),
-    'timeline': [
-        Timeline(dt=datetime.now(),text="старт").dict(), 
-        Timeline(dt=datetime.now() + timedelta(days=1), text="чекпоинт").dict(), 
-        Timeline(dt=datetime.now() + timedelta(days=2), text="конец").dict()],
+        'title': 'Всероссийский хакатон фсп 2023 Воронеж',
+        'description': 'Всероссийский хакатон фсп для студентов',
+        'team_oids': [],
+        'start_dt': datetime.now(),
+        'end_dt': datetime.now() + timedelta(days=2),
+        'timeline': [
+            Timeline(dt=datetime.now(), text="старт").dict(),
+            Timeline(dt=datetime.now() + timedelta(days=1), text="чекпоинт").dict(),
+            Timeline(dt=datetime.now() + timedelta(days=2), text="конец").dict()],
     })
     await db.event_collection.insert_document({
-    'title': 'Тестовый хакатон 2023',
-    'description': 'Тестовый хакатон для теста',
-    'team_oids': [],
-    'start_dt': datetime.now(),
-    'end_dt': datetime.now() + timedelta(days=3),
-    'timeline': [
-        Timeline(dt=datetime.now(),text="старт").dict(), 
-        Timeline(dt=datetime.now() + timedelta(days=1), text="чекпоинт").dict(),
-        Timeline(dt=datetime.now() + timedelta(days=2), text="чекпоинт").dict(), 
-        Timeline(dt=datetime.now() + timedelta(days=3), text="конец").dict(), ],
+        'title': 'Тестовый хакатон 2023',
+        'description': 'Тестовый хакатон для теста',
+        'team_oids': [],
+        'start_dt': datetime.now(),
+        'end_dt': datetime.now() + timedelta(days=3),
+        'timeline': [
+            Timeline(dt=datetime.now(), text="старт").dict(),
+            Timeline(dt=datetime.now() + timedelta(days=1), text="чекпоинт").dict(),
+            Timeline(dt=datetime.now() + timedelta(days=2), text="чекпоинт").dict(),
+            Timeline(dt=datetime.now() + timedelta(days=3), text="конец").dict(), ],
     })
 
 
