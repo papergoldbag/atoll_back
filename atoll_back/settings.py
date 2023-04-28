@@ -39,7 +39,7 @@ class Settings(BaseSettings):
         )
 
     tg_bot_web_app_host: Optional[str] = None
-    tg_bot_webapp_port: Optional[int] = None
+    tg_bot_webapp_port: Optional[int] = 8083
 
     vk_bot_token: str
     vk_group_id: str = "220168186"
