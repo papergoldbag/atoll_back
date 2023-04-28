@@ -582,6 +582,7 @@ async def send_feedback(
     )
     text_tg = (
         "<b>Обратная связь</b>\n"
+        f"<a href='atoll.divarteam.ru/events/{event.int_id}'>Событиее</a>\n"
         f"Отправитель: {user.fullname}\n"
         f"Сообщение: {feedback.text}\n"
         f"Оценка: {feedback.rate}"
