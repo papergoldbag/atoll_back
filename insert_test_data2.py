@@ -12,7 +12,7 @@ from atoll_back.services import create_user, create_team, create_event, create_r
 
 async def insert_test_data():
     setup_logging()
-    await db.user_collection.drop_collection()
+    await db.drop_collections()
     await db.ensure_all_indexes()
 
     await db.user_collection.insert_document({
