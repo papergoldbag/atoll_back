@@ -14,6 +14,7 @@ async def set_commands():
     visible_commands = [
         BotCommand(TgBotCommands.start, emojize(":balloon: Старт")),
         BotCommand(TgBotCommands.events, emojize(":bookmark_tabs: События")),
+        BotCommand(TgBotCommands.my_events, emojize(":bookmark_tabs: Мои обытия")),
         BotCommand(TgBotCommands.site, emojize(":link: Наш сайт"))
     ]
     await bot.set_my_commands(commands=visible_commands)
