@@ -1,39 +1,50 @@
 <h2>Conductor</h2>
 
+<h4>front: https://github.com/PirateThunder/atoll_front.git </h4>
+<h4>mobile: https://github.com/BrightOS/AtollMobile.git </h4>
+
 <h4>Реализованная функциональность</h4>
 <ul>
     <li>Авторизация(Cookie Token, Header Token)</li>
     <li>Аутентификация/Регистрация</li>
     <li>Личный кабинет спортсмена</li>
-    <li>Возможность проходить задачи в roadmap</li>
-    <li>Возможность сохранять прогресс адаптации</li>
-    <li>Сеть(контакты)</li>
-    <li>Панель управления для HR/руководителя</li>
+    <li>Личный кабинет администратора</li>
+    <li>Личный кабинет партнёра</li>
+    <li>Личный кабинет представителя</li>
+    <li>Блок просмотра мероприятий</li>
+    <li>Блок просмотра пользователей</li>
+    <li>Просмотр заявок на создание мероприятий</li>
+    <li>Просмотр отзывов</li>
+    <li>Профиль</li>
+    <li>Возможность изменения профиля</li>
+    <li>Возможность изменения роли</li>
+    <li>Возможность скачать мобильное приложение</li>
+    <li>Система уведомлений через телеграм</li>
+    <li>Система уведомлений на почту</li>
 </ul>
-
-
-<h4>Особенность проекта в следующем:</h4>
-<ul>
-    <li>Гибкость системы ролей</li>
-    <li>Полная адаптивность сайта/приложения</li>
-    <li>Плавная смена темы в ночную/дневную</li>  
-</ul>
-
 
 <h4>Основной стек технологий:</h4>
 <ul>
-    <li>python3.11, FastAPI, mongodb, pymongo, nginx, ubuntu22, certbot, pydantic</li>
-	<li>MongoDB</li>
-	<li>HTML/CSS/JS</li>
+    <li>python3.11</li>
+    <li>FastAPI</li>
+    <li>mongodb</li>
+    <li>motor</li>
+    <li>nginx</li>
+    <li>ubuntu22</li>
+    <li>certbot</li>
+    <li>pydantic</li>
+    <li>uvicorn</li>
+    <li>nginx</li>
+    <li>systemd</li>
  </ul>
 
 
-<h4>Демо</h4>
-<p>Демо сервиса доступно по адресу: https://divarteam.ru/</p>
-<p>Реквизиты тестового пользователя</p>
-<p>Руководитель: <b>Ivan</b> - <b>1</b></p>
-<p>HR: <b>Ivan</b> - <b>1</b></p>
-<p>Сотрудник: <b>Ivan</b> - <b>1</b></p>
+# Демо
+<p>Демо сервиса доступно по адресу: https://atoll.divarteam.ru/</p>
+<p>Админ: </p>
+<p>Спортсмен: </p>
+<p>Партнёр: </p>
+<p>Представитель: </p>
 
 
 СРЕДА ЗАПУСКА
@@ -58,9 +69,9 @@ sudo apt install python3.11
 ~~~
 Создаём пользователя
 ~~~
-adduser conductor
-usermod -aG sudo conductor
-su - conductor
+adduser atoll_back
+usermod -aG sudo atoll_back
+su - atoll_back
 ~~~
 
 Установка poetry
@@ -75,26 +86,28 @@ poetry --version
 
 Установка репозитория
 ~~~
-git clone git@github.com:papergoldbag/conductor.git
-cd conductor
+git clone git@github.com:papergoldbag/atoll_back.git
+cd atoll_back
 poetry env use python3.11
 poetry install
 ~~~
 
 Нужно создать файл .env и поместить туда
 ~~~
-mongo_user = "..."
-mongo_password = "..."
-mongo_host = "..."
-mongo_port = ...
-mongo_auth_db = "..."
-mongo_db_name = "..."
+mongo_host=
+mongo_port=
+mongo_db_name=
+mongo_user=
+mongo_password=
+mongo_auth_db=
 
-mailru_login = '...'
-mailru_password = '.'
+tg_bot_token=
+vk_bot_token=
 
-tg_bot_token = '...'
-tg_admin_ids = [...]
+mailru_login=
+mailru_password=
+mailru_server="smtp.mail.ru"
+mailru_port=465
 ~~~
 
 
@@ -127,28 +140,30 @@ db.createUser(
 })
 db.createUser(
 {
-  user: "conductor",
+  user: "atoll",
   pwd: passwordPrompt(),
   roles: [
-  {role: "readWrite", db: "production"}
+  {role: "readWrite", db: "prod"}
   ]
 })
+
+...
 ~~~
 
 
-### Сайт как сервис
+### API как сервис
 Нужно скопировать файл conductor.service в /etc/systemd/system/conductor.service
 ~~~
-sudo cp ./conductor.service /etc/systemd/system/conductor.service
-sudo systemctl start conductor
+sudo cp ./api.service /etc/systemd/system/api.service
+sudo systemctl start api
 ~~~
 
 
 ### Бот как сервис
 Нужно скопировать файл conductor_bot.service в /etc/systemd/system/conductor_bot.service
 ~~~
-sudo cp ./conductor_bot.service /etc/systemd/system/conductor_bot.service
-sudo systemctl start conductor_bot
+sudo cp ./tg_bot.service /etc/systemd/system/tg_bot.service
+sudo systemctl start tg_bot
 ~~~
 
 
@@ -178,7 +193,3 @@ sudo systemctl restart nginx
 <h4>Арсен Сабирзянов - Backend https://t.me/arpakit </h4>
 <h4>Иван Ермолов - Data-Scientist https://t.me/ivan_20190721 </h4>
 <h4>Рустам Афанасьев - Project manager, Analytic https://t.me/rcr_tg </h4>
-
-
-front: https://github.com/PirateThunder/atoll_front.git
-mobile: https://github.com/BrightOS/AtollMobile.git
