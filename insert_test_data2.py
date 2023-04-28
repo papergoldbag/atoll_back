@@ -12,6 +12,7 @@ from atoll_back.services import create_user, create_team, create_event, create_r
 
 async def insert_test_data():
     setup_logging()
+    await db.ensure_all_indexes()
     await db.user_collection.drop_collection()
     
     await db.user_collection.insert_document({
@@ -35,7 +36,7 @@ async def insert_test_data():
         'tg_username': "rcr_tg",
         'tg_id': "373740493",
         'vk_id': "",
-        'roles': [UserRoles.sportsman],
+        'roles': [UserRoles.dev],
         'description': ""
     })
     await db.user_collection.insert_document({
@@ -75,7 +76,7 @@ async def insert_test_data():
 
     for i in range(5):
         tu1: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': "Sportsman1_{i}",
+            'fullname': f"Sportsman1_{i}",
             'mail': f"tu1_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
@@ -86,7 +87,7 @@ async def insert_test_data():
             'description': ""
         }))
         tu2: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': "Sportsman2_{i}",
+            'fullname': f"Sportsman2_{i}",
             'mail': f"tu2_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
@@ -97,7 +98,7 @@ async def insert_test_data():
             'description': ""
         }))
         tu3: User = User.parse_document(await db.user_collection.insert_document({
-            'fullname': "Sportsman3_{i}",
+            'fullname': f"Sportsman3_{i}",
             'mail': f"tu3_{i}@test.ru",
             'tokens': [],
             'birth_dt': None,
@@ -126,7 +127,7 @@ async def insert_test_data():
 
     await db.user_collection.insert_document({
         'fullname': "Тестовый представитель",
-        'mail': "",
+        'mail': "repr@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "no exists",
@@ -137,7 +138,7 @@ async def insert_test_data():
     })
     await db.user_collection.insert_document({
         'fullname': "Тестовый Партнер",
-        'mail': "",
+        'mail': "part@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "",
@@ -150,7 +151,7 @@ async def insert_test_data():
 
     await db.user_collection.insert_document({
         'fullname': "Dev1",
-        'mail': "",
+        'mail': "dev@test.ru",
         'tokens': [],
         'birth_dt': None,
         'tg_username': "",
