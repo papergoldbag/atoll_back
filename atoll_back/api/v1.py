@@ -22,7 +22,7 @@ from atoll_back.services import accept_invite, create_invite, create_representat
     remove_mail_code, send_from_tg_bot, update_user, get_events, get_ratings, get_teams, get_team, get_event, \
     create_event_request, \
     get_event_requests, get_event_request, event_request_to_event, create_team, create_rating, create_feedback, \
-    get_feedbacks
+    get_feedbacks, get_event_analytics
 from atoll_back.utils import send_mail
 
 api_v1_router = APIRouter(prefix="/v1")
@@ -537,7 +537,8 @@ async def get_event_by_id(int_id: int = Query(...), user: User = Depends(get_str
         **event_d,
         ratings=ratings,
         teams=res,
-        is_my=is_my
+        is_my=is_my,
+        analytics=EventAnalyticsOut.parse_obj(await get_event_analytics(id_=event.oid))
     )
 
 

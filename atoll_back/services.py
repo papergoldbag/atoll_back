@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from random import randint
 from typing import Union, Optional
+from statistics import mean, median
 
 import pymongo
 from bson import ObjectId
@@ -455,6 +456,28 @@ async def event_request_to_event(*, event_request_oid: ObjectId) -> Event:
 
 
 """EVENT LOGIC"""
+
+
+async def get_event_analytics(*, id_: Id):
+    event = await get_event(id_=id_)
+    if event is None:
+        raise ValueError("event is None")
+    event_teams = [len((await get_team(id_=x)).user_oids) for x in event.team_oids]
+
+    feedbacks = [x.rate for x in await get_feedbacks(event_id=event.oid)]
+
+    a_d = dict(
+        teams_count=len(event_teams),
+        mean_teams_participants=int(mean(event_teams)) if event_teams else 0,
+        median_teams_participants=int(median(event_teams)) if event_teams else 0,
+        participants_count=sum(event_teams),
+        feedbacks_count=len(feedbacks),
+        mean_rate=int(mean(feedbacks)) if feedbacks else 0,
+        median_rate=int(median(feedbacks)) if feedbacks else 0
+    )
+
+    return a_d
+
 
 
 async def get_event(*, id_: Id) -> Optional[Event]:
