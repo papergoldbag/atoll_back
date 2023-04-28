@@ -452,8 +452,8 @@ async def get_analytics(event_int_id: int = Query(...),
 
     a_d = dict(
         teams_count=len(event_teams),
-        mean_teams_participants=int(mean(event_teams)),
-        median_teams_participants=int(median(event_teams)),
+        mean_teams_participants=int(mean(event_teams)) if event_teams else 0,
+        median_teams_participants=int(median(event_teams)) if event_teams else 0,
         participants_count=sum(event_teams),
         feedbacks_count=len(feedbacks),
         mean_rate=int(mean(feedbacks)) if feedbacks else 0,
@@ -693,7 +693,7 @@ async def accept_event_request(
     for userm in await get_users():
         try:
             send_mail(userm.mail, subject="Новое мероприятие", text=(
-                f"<b>Появилось новое мероприятие {event.title}\n"
+                f"<b>Появилось новое мероприятие {event.title}</b>\n"
                 f"<a href='https://atoll.divarteam.ru/events/{event.int_id}'>Подробнее</a>'"
             ))
         except:
